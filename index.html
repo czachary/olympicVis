@@ -6,58 +6,63 @@
 </head>
 <body>
     <h1>Olympic Visualization</h1>
+    <span class="timeline">
+      <div id="slider"></div>
+    </span>
     <div id="svg_container"></div>
     <script src="vis.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+    $( function() {
+      $( "#slider" ).slider({
+          value: 1896,
+          min: 1896,
+          max: 2008,
+          step: 4,
+          animate: "fast",
+          change: function(event, ui) {
+            sliderChange(ui.value);
+          }
+        })
+        .each(function() {
+          var opt = $(this).data().uiSlider.options;
+          var vals = opt.max - opt.min;
+
+          // Position the labels
+          for (var i = 0; i <= vals; i+=8) {
+              var el = $('<label>' + (i + opt.min) + '</label>').css('left', (i/vals*100) + '%');
+              $("#slider").append(el);
+          }
+
+        });
+      });
+    </script>
 </body>
 
 <style>
+
+  body {
+    margin: 20px;
+  }
 
 	text {
 		font-size: 9px;
 	}
 
-  /*.tooltip {
-    background: #fff;
-    color: #202020;
-    border-radius: 5px;
+  #slider label {
     position: absolute;
-    padding: 10px;
-    pointer-events: none;
-    text-align: left;
-    opacity: .25;
+    width: 20px;
+    margin-top: 20px;
+    margin-left: -10px;
+    text-align: center;
   }
 
-  body {
-  font: 11px sans-serif;
-  font-weight: 400;
-  text-align: center;
-  background: #202020;
-  color: #ff0000;
-  font-family: 'Montserrat', sans-serif;
-}
-
-h1 {
-  font-weight: 300;
-  color: #ffffff;
-  font-size: 18px;
-  margin: 25px 0px 25px 0px;
-  padding: 0;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-h2 {
-  font-weight: 400;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #fff;
-  shape-rendering: crispEdges;
-}*/
+  .timeline * {
+    font-size: 10px;
+    margin-bottom: 10px;
+  }
 
 
 </style>

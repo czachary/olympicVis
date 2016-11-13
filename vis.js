@@ -1,14 +1,32 @@
 
 var margin = {top: 20, right: 160, bottom: 35, left: 30};
+var allData;
+
 
 
 //*****GET DATA********//
 
 d3.csv("OlympicData.csv", function (error, data) {
 
-  //TODO: choose year
-  data = data.filter(function(d) {
-    if (d.Year == 2008) return true;
+  allData = data;
+  displayData(1896);
+
+});
+
+
+//******YEAR CHANGE******//
+function sliderChange(year) {
+  d3.select("svg.stackedBar").remove();
+  displayData(year);
+}
+
+
+//*******DISPLAY******//
+
+function displayData(year) {
+
+  data = allData.filter(function(d) {
+    if (d.Year == year) return true;
   })
 
   var countryMedalData = {};
@@ -26,6 +44,7 @@ d3.csv("OlympicData.csv", function (error, data) {
 
   var barChart = d3.select('#svg_container')
     .append("svg")
+    .attr("class", "stackedBar")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -99,9 +118,6 @@ d3.csv("OlympicData.csv", function (error, data) {
     .attr("class", "y axis")
     .call(yAxis);
 
-  barChart.append("g")
-    .attr("class", "x axis")
-    .call(xAxis);
 
   // Create groups for each series, rects for each segment 
   var groups = barChart.selectAll("g.medalcounts")
@@ -119,4 +135,4 @@ d3.csv("OlympicData.csv", function (error, data) {
     .attr("height", function(d) { return y.rangeBand(); })
     .attr("width", function(d) { return x(d.x0+d.x) - x(d.x0); });
 
-});
+}
