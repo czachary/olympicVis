@@ -1,6 +1,8 @@
 
 var margin = {top: 20, right: 160, bottom: 35, left: 30};
 var allData;
+var year = 1896;
+var stackedOrder = ["Gold", "Silver", "Bronze"];
 
 var tooltip = d3.select("body").append("div")
   .attr("class", "tooltip")
@@ -13,21 +15,21 @@ var tooltip = d3.select("body").append("div")
 d3.csv("OlympicData.csv", function (error, data) {
 
   allData = data;
-  displayData(1896);
+  displayData(year);
 
 });
 
 
 //******YEAR CHANGE******//
-function sliderChange(year) {
-  d3.select("svg.stackedBar").remove();
-  displayData(year);
+function sliderChange(yearSelected) {
+  year = yearSelected;
+  displayData();
 }
 
 
 //*******DISPLAY******//
 
-function displayData(year) {
+function displayData() {
 
   data = allData.filter(function(d) {
     if (d.Year == year) return true;
@@ -55,12 +57,13 @@ function displayData(year) {
 
     var newEntry = {};
     newEntry["Country"] = key;
-    newEntry["GoldCount"] = goldCount;
-    newEntry["SilverCount"] = silverCount;
-    newEntry["BronzeCount"] = bronzeCount;
+    newEntry["Gold"] = goldCount;
+    newEntry["Silver"] = silverCount;
+    newEntry["Bronze"] = bronzeCount;
     newEntry["totalMedalCount"] = goldCount+silverCount+bronzeCount;
     countryMedalCounts.push(newEntry);
   }
+  countryMedalCounts.sort(function(a,b) { return b.Gold - a.Gold;})
 
   stackedBarChart(countryMedalCounts);
 
@@ -69,11 +72,11 @@ function displayData(year) {
 
 function stackedBarChart(data) {
 
-  //TODO: sort by gold, silver, or bronze on click
-  data.sort(function(a,b) { return b.GoldCount - a.GoldCount;})
+  d3.select("svg.stackedBar").remove();
+
   var numCountries = Object.keys(data).length;
 
-  var width = 500 - margin.left - margin.right,
+  var width = 600 - margin.left - margin.right,
       height = (numCountries*25) - margin.top - margin.bottom;
 
   var barChart = d3.select('#svg_container')
@@ -84,7 +87,7 @@ function stackedBarChart(data) {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  var dataset = d3.layout.stack()(["GoldCount", "SilverCount", "BronzeCount"].map(function(medals) {
+  var dataset = d3.layout.stack()([stackedOrder[0], stackedOrder[1], stackedOrder[2]].map(function(medals) {
     return data.map(function(d) {
       return {x: d.Country, y: +d[medals]};
     });
@@ -109,8 +112,6 @@ function stackedBarChart(data) {
     .domain(dataset[0].map(function(d) { return d.y; }))
     .rangeRoundBands([10, height-10], .1);
 
-  var colors = ["#f2b447", "#A9A9A9", "b33040"]; //gold, silver, bronze
-
   // Define and draw axes
   var yAxis = d3.svg.axis()
     .scale(y)
@@ -132,7 +133,8 @@ function stackedBarChart(data) {
     .data(dataset)
     .enter().append("g")
     .attr("class", "medalcounts")
-    .style("fill", function(d, i) { return colors[i]; });
+    .style("fill", function(d, i) { return color(stackedOrder[i]); })
+    .on('click', function(d,i) { updateStacked(i); });
 
   var rect = groups.selectAll("rect")
     .data(function(d) { return d; })
@@ -158,4 +160,19 @@ function stackedBarChart(data) {
         .style("top", (d3.event.pageY-30) + "px");
     });
 
+}
+
+function updateStacked(medalType) {
+  var newType = stackedOrder[medalType];
+  if(newType == "Gold") stackedOrder = ["Gold", "Silver", "Bronze"];
+  else if (newType == "Silver") stackedOrder = ["Silver", "Gold", "Bronze"];
+  else if (newType == "Bronze") stackedOrder = ["Bronze", "Gold", "Silver"];
+
+  displayData();
+}
+
+function color(medalType) {
+  if(medalType == "Gold") return "#f2b447";
+  else if(medalType == "Silver") return "#A9A9A9";
+  else if(medalType == "Bronze") return "#b33040"
 }
