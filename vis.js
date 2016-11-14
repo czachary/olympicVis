@@ -1,5 +1,5 @@
 
-var margin = {top: 20, right: 160, bottom: 35, left: 30};
+var margin = {top: 55, right: 160, bottom: 35, left: 30};
 var allData;
 var year = 1896;
 var stackedOrder = ["Gold", "Silver", "Bronze"];
@@ -76,16 +76,23 @@ function stackedBarChart(data) {
 
   var numCountries = Object.keys(data).length;
 
-  var width = 600 - margin.left - margin.right,
-      height = (numCountries*25) - margin.top - margin.bottom;
+  var width = 500, height = (numCountries*25);
 
-  var barChart = d3.select('#svg_container')
+  var barChart = d3.select('#stackedBar_container')
     .append("svg")
-    .attr("class", "stackedBar")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+      .attr("class", "stackedBar")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  d3.select("svg.stackedBar")
+    .append("text")
+    .attr("x", (width / 2))
+    .attr("y", margin.top-18)
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px")
+    .text("Total Medal Count by Country")
 
   var dataset = d3.layout.stack()([stackedOrder[0], stackedOrder[1], stackedOrder[2]].map(function(medals) {
     return data.map(function(d) {
@@ -110,7 +117,7 @@ function stackedBarChart(data) {
 
   var y = d3.scale.ordinal()
     .domain(dataset[0].map(function(d) { return d.y; }))
-    .rangeRoundBands([10, height-10], .1);
+    .rangeRoundBands([0, height], .1, 0);
 
   // Define and draw axes
   var yAxis = d3.svg.axis()
@@ -126,6 +133,11 @@ function stackedBarChart(data) {
   barChart.append("g")
     .attr("class", "y axis")
     .call(yAxis);
+
+  barChart.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0,-14)")
+    .call(xAxis);
 
 
   // Create groups for each series, rects for each segment 
