@@ -2,6 +2,10 @@
 var margin = {top: 20, right: 160, bottom: 35, left: 30};
 var allData;
 
+var tooltip = d3.select("body").append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
 
 
 //*****GET DATA********//
@@ -37,21 +41,9 @@ function displayData(year) {
       countryMedalData[d.NOC] = [d.Medal];
     }
   })
-  var numCountries = Object.keys(countryMedalData).length;
-
-  var width = 500 - margin.left - margin.right,
-      height = (numCountries*25) - margin.top - margin.bottom;
-
-  var barChart = d3.select('#svg_container')
-    .append("svg")
-    .attr("class", "stackedBar")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-  //*******BUILD STACKED BARCHART
+  //*******GET ALL COUNTRY MEDAL COUNTS
   var countryMedalCounts = [];
   for (var key in countryMedalData) {
     var goldCount = 0, silverCount = 0, bronzeCount = 0;
@@ -70,14 +62,30 @@ function displayData(year) {
     countryMedalCounts.push(newEntry);
   }
 
+  stackedBarChart(countryMedalCounts);
 
-  //TODO: sort by gold, silver, bronze, not just gold
-  countryMedalCounts.sort(function(a,b) { return b.GoldCount - a.GoldCount;})
+}
 
-  //console.log(countryMedalCounts);
+
+function stackedBarChart(data) {
+
+  //TODO: sort by gold, silver, or bronze on click
+  data.sort(function(a,b) { return b.GoldCount - a.GoldCount;})
+  var numCountries = Object.keys(data).length;
+
+  var width = 500 - margin.left - margin.right,
+      height = (numCountries*25) - margin.top - margin.bottom;
+
+  var barChart = d3.select('#svg_container')
+    .append("svg")
+    .attr("class", "stackedBar")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   var dataset = d3.layout.stack()(["GoldCount", "SilverCount", "BronzeCount"].map(function(medals) {
-    return countryMedalCounts.map(function(d) {
+    return data.map(function(d) {
       return {x: d.Country, y: +d[medals]};
     });
   }));
@@ -133,6 +141,21 @@ function displayData(year) {
     .attr("x", function(d) { return x(d.x0); })
     .attr("y", function(d) { return y(d.y); })
     .attr("height", function(d) { return y.rangeBand(); })
-    .attr("width", function(d) { return x(d.x0+d.x) - x(d.x0); });
+    .attr("width", function(d) { return x(d.x0+d.x) - x(d.x0); })
+    .on("mouseover", function(d) { 
+      tooltip.transition()
+        .duration(200)
+        .style("opacity", 0.75);
+    })
+    .on("mouseout", function() {
+      tooltip.transition()
+          .duration(200)
+          .style("opacity", 0);
+    })
+    .on("mousemove", function(d) {
+      tooltip.html(d.x)
+        .style("left", (d3.event.pageX-10) + "px")
+        .style("top", (d3.event.pageY-30) + "px");
+    });
 
 }
