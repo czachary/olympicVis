@@ -3,17 +3,27 @@
     <meta charset="utf-8">
     <title>TeamUSA</title>
     <script src="d3/d3.v3.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+    <script src="datamaps.world.min.js"></script>
 </head>
 <body>
-    <h1>Olympic Visualization</h1>
-    <span class="timeline">
-      <div id="slider"></div>
-    </span>
+    <div id="top_panel">
+      <h1>Olympic Visualization</h1>
+      <span class="timeline">
+        <div id="slider"></div>
+      </span>
+    </div>
+
+    <div class="spacer">
+      &nbsp;
+    </div>
+
     <div id="stackedBar_container"></div>
     <div id="map_container"></div>
     <div id="linegraph_container"></div>
 
 
+    <script src="map.js"></script>
     <script src="vis.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -55,6 +65,21 @@
 		font-size: 9px;
 	}
 
+  #top_panel {
+    position: fixed;
+    width: 95%;
+    padding: 0 0 20px 20px;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background-color: #FFFFFF;
+  }
+
+  .spacer {
+    width: 100%;
+    height: 100px;
+  }
+
   #slider label {
     position: absolute;
     width: 20px;
@@ -79,5 +104,15 @@
     opacity: .25;
   }
 
+  rect {
+    stroke: black;
+    stroke-width: 0;
+  }
+
+  #map_container {
+    position: fixed;
+    top: 130px;
+    right: 20px;
+  }
 
 </style>

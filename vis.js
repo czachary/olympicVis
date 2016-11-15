@@ -67,6 +67,7 @@ function displayData() {
 
   stackedBarChart(countryMedalCounts);
 
+  updateMapContainer(countryMedalCounts);
 }
 
 
@@ -160,11 +161,19 @@ function stackedBarChart(data) {
       tooltip.transition()
         .duration(200)
         .style("opacity", 0.75);
+      d3.selectAll(".datamaps-subunit")
+        .filter(function(datamap) { return d.y == datamap.id; })
+        .style("stroke", mapHighlightBorderColor)
+        .style("stroke-width", 2);
     })
-    .on("mouseout", function() {
+    .on("mouseout", function(d) {
       tooltip.transition()
           .duration(200)
           .style("opacity", 0);
+      d3.selectAll(".datamaps-subunit")
+        .filter(function(datamap) { return d.y == datamap.id; })
+        .style("stroke", mapBorderColor)
+        .style("stroke-width", 1);
     })
     .on("mousemove", function(d) {
       tooltip.html(d.x)
@@ -184,7 +193,7 @@ function updateStacked(medalType) {
 }
 
 function color(medalType) {
-  if(medalType == "Gold") return "#f2b447";
-  else if(medalType == "Silver") return "#A9A9A9";
-  else if(medalType == "Bronze") return "#b33040"
+  if(medalType == "Gold") return "#e5c100";
+  else if(medalType == "Silver") return "#acacac";
+  else if(medalType == "Bronze") return "#cd7f32"
 }
