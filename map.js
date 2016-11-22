@@ -2,7 +2,11 @@ var mapDefaultFill = "#F5F5F5";
 var mapBorderColor = "#DEDEDE";
 var mapHighlightBorderColor = "#B7B7B7";
 
-var world_map = new Datamap({
+var world_map;
+
+function initWorldMap() {
+
+  world_map = new Datamap({
     element: document.getElementById("map_container"),
     height: 400,
     width: 600,
@@ -42,12 +46,12 @@ var world_map = new Datamap({
       });
 
       //Mouse Over
-      //Cannot 
+      //Cannot use the regular way of implementing mouseover since that would override the border automatic highlighting
       var mapContainer = d3.selectAll("#map_container");
       mapContainer.on('mouseover', function(info) {
         if (d3.event.target.tagName == "path") {
-          d3.selectAll("rect")
-              .filter(function(d) { return d.y == getCountry().id; })
+          d3.selectAll("g.medalcounts")
+              .filter(function(d) { return convertCountryCode(d.Country) == getCountry().id; })
               .style("stroke-width", 2);
         }
       });
@@ -55,15 +59,18 @@ var world_map = new Datamap({
       //Mouse Out
       mapContainer.on('mouseout', function(info) {
         if (d3.event.target.tagName == "path") {
-          d3.selectAll("rect")
-              .filter(function(d) { return d.y == getCountry().id; })
+          d3.selectAll("g.medalcounts")
+              .filter(function(d) { return convertCountryCode(d.Country) == getCountry().id; })
               .style("stroke-width", 0);
         }
       });
     }
   });
+}
 
-function updateMapContainer(data) {
+function updateMapContainer() {
+  var data = datasets["curr"];
+
   var dataset = {};
 
   var minValue = d3.min(data, function(d) { return d.totalMedalCount; }),
@@ -75,8 +82,109 @@ function updateMapContainer(data) {
 
   data.forEach(function(d) {
     var value = d.totalMedalCount;
-    dataset[d.Country] = { numberOfThings: value, fillColor: paletteScale(value) };
+    dataset[convertCountryCode(d.Country)] = { numberOfThings: value, fillColor: paletteScale(value) };
   });
 
   world_map.updateChoropleth(dataset, {reset: true});
+}
+
+/**
+ * Converts the olympic IOC country code to the ISO standard code that the datamap uses.
+ * For some countries there is a mismatch, but for others the olympic country no longer exists.
+ **/
+function convertCountryCode(code) {
+  switch (code) {
+    case "ALG": return "DZA"; //algeria
+    case "BAH": return "BHS"; //bahamas
+    case "BAR": return "BRB"; //barbados
+    case "BER": return "BMU"; //bermuda
+    case "BUL": return "BGR"; //bulgaria
+    case "CHI": return "CHL"; //chile
+    case "CRO": return "HRV"; //croatia
+    case "CRC": return "CRI"; //costa rica
+    case "DEN": return "DNK"; //denmark
+    case "GER": return "DEU"; //germany
+    case "GRE": return "GRC"; //greece
+    case "HAI": return "HTI"; //haiti
+    case "INA": return "IDN"; //indonesia
+    case "IRI": return "IRN"; //iran
+    case "KUW": return "KWT"; //kuwait
+    case "LAT": return "LVA"; //latvia
+    case "LIB": return "LBN"; //lebanon
+    case "MRI": return "MUS"; //mauritius
+    case "MAS": return "MYS"; //malaysia
+    case "MGL": return "MNG"; //mongolia
+    case "NIG": return "NER"; //niger
+    case "NGR": return "NGA"; //nigeria
+    case "NED": return "NLD"; //netherlands
+    case "PAR": return "PRY"; //paraguay
+    case "PHI": return "PHL"; //philippines
+    case "POR": return "PRT"; //portugal
+    case "PUR": return "PRI"; //puerto rico
+    case "KSA": return "SAU"; //saudi arabia
+    case "SIN": return "SGP"; //singapore
+    case "SLO": return "SVN"; //slovenia
+    case "RSA": return "ZAF"; //south africa
+    case "SRI": return "LKA"; //sri lanka
+    case "SUD": return "SDN"; //sudan
+    case "SUI": return "CHE"; //switzerland
+    case "TPE": return "TWN"; //taiwan
+    case "TAN": return "TZA"; //tanzania
+    case "TOG": return "TGO"; //togo
+    case "TGA": return "TON"; //tonga
+    case "TRI": return "TTO"; //trinidad and tobago
+    case "UAE": return "ARE"; //united arab emirates
+    case "URU": return "URY"; //uruguay
+    case "ISV": return "VIR"; //u.s. virgin islands
+    case "VIE": return "VNM"; //vietnam
+    case "ZAM": return "ZMB"; //zambia
+    case "ZIM": return "ZWE"; //zimbabwe
+    case "EUA": return "DEU"; //unified team of germany-> germany
+    case "TCH": return "CZE"; //czechoslovakia -> czech republic
+    case "BOH": return "CZE"; //bohemia -> czech republic
+    case "ANZ": return "AUS"; //australasia -> australia
+    case "URS": return "RUS"; //soviet union -> russia
+    case "RU1": return "RUS"; //russian empire -> russia
+    case "YUG": return "BIH"; //yugoslavia -> bosnia and herzegovina
+    default: return code;
+  }
+}
+
+/**
+ * Finds the country name by converting the IOC country code to the ISO standard code.
+ * Countries that no longer exist or are not on the map are manually coded.
+ **/
+function countryName(country) {
+  switch (country) {
+    case "ANZ": return "Australasia";
+    case "TCH": return "Czechoslovakia";
+    case "URS": return "Soviet Union";
+    case "RU1": return "Russian Empire";
+    case "YUG": return "Yugoslavia";
+    case "SCG": return "Serbia and Montenegro";
+    case "BOH": return "Bohemia";
+    case "EUA": return "Unified Team of Germany";
+    case "FRG": return "West Germany";
+    case "GDR": return "East Germany";
+    case "AHO": return "Netherlands Antilles";
+    case "HKG": return "Hong Kong";
+    case "ISV": return "U.S. Virgin Islands";
+    case "IOP": return "Ind. Olympic Participants"
+    case "EUN": return "Unified Team (USSR)";
+    case "MRI": return "Mauritius";
+    case "SIN": return "Singapore";
+    case "BER": return "Bermuda";
+    case "TGA": return "Tonga";
+    case "BAR": return "Barbados";
+    case "ZZX": return "Mixed Teams";
+    case "BWI": return "West Indies Federation";
+  }
+
+  var countryCode = convertCountryCode(country);
+  var names = [];
+  var data = d3.selectAll(".datamaps-subunit")
+    .filter(function(d) { return countryCode == d.id; })
+    .each(function(d) { names.push(d.properties.name); })
+
+  return names.length > 0 ? names[0] : country;
 }

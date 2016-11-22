@@ -6,7 +6,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
     <script src="datamaps.world.min.js"></script>
 </head>
-<body>
+<body onload="init()">
     <div id="top_panel">
       <h1>Olympic Visualization</h1>
       <span class="timeline">
@@ -38,6 +38,20 @@
           animate: "fast",
           change: function(event, ui) {
             sliderChange(ui.value);
+          },
+          slide: function(event, ui) {
+            var badValues = [1916, 1940, 1944];
+            var delta = ui.value - $(this).slider("value");
+            for (var i = 0; i < badValues.length; i++) {
+              if (ui.value == badValues[i]) {
+                var newVal = ui.value;
+                while ($.inArray(newVal, badValues) != -1) {
+                  newVal += 4 * (delta > 0 ? 1 : -1);
+                }
+                $(this).slider("value", newVal);
+                return false;
+              }
+            }
           }
         })
         .each(function() {
@@ -61,8 +75,15 @@
     margin: 20px;
   }
 
+  p {
+    font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+    font-size: 13px;
+    line-height: 25px;
+  }
+
 	text {
-		font-size: 9px;
+    font-family: helvetica, sans-serif, tahoma;
+		font-size: 11px;
 	}
 
   #top_panel {
@@ -104,7 +125,7 @@
     opacity: .25;
   }
 
-  rect {
+  .medalcounts {
     stroke: black;
     stroke-width: 0;
   }
@@ -113,6 +134,14 @@
     position: fixed;
     top: 130px;
     right: 20px;
+  }
+
+  .datamaps-subunits {
+    cursor: pointer;
+  }
+
+  .clickable {
+    cursor: pointer;
   }
 
 </style>
