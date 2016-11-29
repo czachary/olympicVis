@@ -5,7 +5,7 @@ var init_order = ["Gold", "Silver", "Bronze"];
 var stack_order = init_order.slice();
 
 var width, height;
-var barChart;
+var barChart, lineGraph;
 var x_scale, y_scale, xAxis, yAxis;
 
 var barMoveDuration = 800;
@@ -105,6 +105,7 @@ function onDataArrival(error, data) {
 
   stackedBarChart();
   updateMapContainer();
+  updateLineGraph();
 }
 
 //*******GET ALL COUNTRY MEDAL COUNTS*******//
@@ -286,4 +287,81 @@ function color(medalType) {
   if(medalType == "Gold") return "#e5c100";
   else if(medalType == "Silver") return "#acacac";
   else if(medalType == "Bronze") return "#cd7f32"
+}
+
+
+
+////***LINE GRAPH
+
+function updateLineGraph() {
+
+  var countryMedals = datasets["countries"]["USA"]  //TODO: default to top medal earner of year, allow country selection
+
+  var medalsOverTime = [];
+  for(i=0; i<5; i++) //TODO: define which years we actually want, instead of curr + next 4
+  {
+    medalsOverTime[i] = {};
+    medalsOverTime[i]["year"] = year+(i*4);
+    medalsOverTime[i]["count"] = 0;
+    countryMedals.forEach(function(d) {
+      if (d.Year == year+(i*4)) medalsOverTime[i]["count"]++;
+    })
+  }
+
+  console.log(medalsOverTime);
+
+
+  var x = d3.scale.ordinal().rangeRoundBands([0, width], .5, 0);//.range([0, width]);
+  var y = d3.scale.linear().range([height, 0]);
+
+  // Define the axes
+  var xAxis = d3.svg.axis().scale(x)
+      .orient("bottom");
+
+  var yAxis = d3.svg.axis().scale(y)
+      .orient("left");
+
+  // Define the line
+  var valueline = d3.svg.line()
+      .x(function(d) { return x(d.year); })
+      .y(function(d) { return y(d.count); });
+      
+
+  var lineGraphWidth = 500, lineGraphHeight = 500;
+
+  lineGraph = d3.select('#linegraph_container')
+    .append("svg")
+      .attr("class", "linegraph")
+      .attr("width", lineGraphWidth + margin.left + margin.right)
+      .attr("height", lineGraphHeight + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  d3.select("svg.linegraph")
+    .append("text")
+    .attr("x", (width / 2))
+    .attr("y", margin.top-18)
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px")
+    .text("Medal Count Over Time: COUNTRY NAME") //TODO
+
+  x.domain(medalsOverTime.map(function(d) { return d.year; }));
+  y.domain([0, d3.max(medalsOverTime, function(d) { return d.count; })]);
+
+  // Add the valueline path
+  lineGraph.append("path")
+      .attr("class", "line")
+      .attr("d", valueline(medalsOverTime));
+
+  // Add the X Axis
+  lineGraph.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  // Add the Y Axis
+  lineGraph.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
 }
