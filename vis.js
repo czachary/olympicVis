@@ -5,7 +5,7 @@ var init_order = ["Gold", "Silver", "Bronze"];
 var stack_order = init_order.slice();
 
 var width, height;
-var barChart, lineGraph;
+var barChart;
 var x_scale, y_scale, xAxis, yAxis;
 
 var barMoveDuration = 800;
@@ -16,8 +16,11 @@ var tooltip = d3.select("body").append("div")
 
 var datasets = {}
 
+var lineGraphWidth = 500, lineGraphHeight = 300;
+var lineGraph, valueline;
 var lineGraphCountries = [];
 var numCushionYears = 4;
+var x_scaleLine, y_scaleLine, xAxisLine, yAxisLine;
 
 
 //*****INITIALIZE DISPLAY & GET DATA********//
@@ -25,6 +28,7 @@ var numCushionYears = 4;
 function init() {
   initStackedBarChart();
   initWorldMap();
+  initLineGraph();
 
   d3.csv("OlympicData.csv", onDataArrival);
 }
@@ -76,6 +80,31 @@ function initStackedBarChart() {
     .attr("class", "x_axis")
     .attr("transform", "translate(0,-14)")
     .call(xAxis);
+}
+
+function initLineGraph() {
+
+  x_scaleLine = d3.scale.ordinal().rangeRoundBands([0, lineGraphWidth], .5, 0);
+  y_scaleLine = d3.scale.linear().range([lineGraphHeight, 0]);
+
+  var bluescale4 = ["#8BA9D0", "#6A90C1", "#066CA9", "#004B8C"];
+  linegraphcolor = d3.scale.ordinal().range(bluescale4);
+
+  lineGraph = d3.select('#linegraph_container')
+    .append("svg")
+      .attr("class", "linegraph")
+      .attr("width", lineGraphWidth + margin.left + margin.right)
+      .attr("height", lineGraphHeight + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  d3.select("svg.linegraph")
+    .append("text")
+    .attr("x", (lineGraphWidth / 2))
+    .attr("y", margin.top-18)
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px")
+    .text("Medal Count Over Time")
 }
 
 //******YEAR CHANGE******//
@@ -298,7 +327,6 @@ function color(medalType) {
 
 ////***LINE GRAPH
 function updateLineGraphCountries(countryId) {
-
   countryIndex = lineGraphCountries.indexOf(countryId);
   if(countryIndex != -1) { //if in array, remove
     lineGraphCountries.splice(countryIndex, 1);
@@ -307,13 +335,17 @@ function updateLineGraphCountries(countryId) {
     lineGraphCountries.push(countryId);
     updateLineGraph();
   }
-console.log(lineGraphCountries);
+}
+
+function updateLineGraph() {
+  d3.transition()
+      .duration(1500)
+      .each(redraw);
 }
 
 
-function updateLineGraph() {
+function redraw() {
 
-  d3.select('#linegraph_container').selectAll("*").remove();
   var medalsOverTime = [];
 
   //get year range to display
@@ -346,74 +378,87 @@ function updateLineGraph() {
 
   });
 
-
-console.log(medalsOverTime);
-
-  var lineGraphWidth = 500, lineGraphHeight = 300;
-  var x = d3.scale.ordinal().rangeRoundBands([0, lineGraphWidth], .5, 0);
-  var y = d3.scale.linear().range([lineGraphHeight, 0]);
-
-  // Define the axes
-  var xAxis = d3.svg.axis().scale(x)
-      .orient("bottom");
-
-  var yAxis = d3.svg.axis().scale(y)
-      .orient("left");
-
-  // Define the line
-  var valueline = d3.svg.line()
-      .x(function(d) { return x(d.year); })
-      .y(function(d) { return y(d.count); });
-
-  lineGraph = d3.select('#linegraph_container')
-    .append("svg")
-      .attr("class", "linegraph")
-      .attr("width", lineGraphWidth + margin.left + margin.right)
-      .attr("height", lineGraphHeight + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-  x.domain(medalsOverTime.map(function(d) { return d.year; }));
-  y.domain([0, d3.max(medalsOverTime, function(d) { return d.count; })]);
-
   // Nest the entries by country
   var dataNest = d3.nest()
       .key(function(d) {return d.country;})
       .entries(medalsOverTime);
 
-  var color = d3.scale.category10();  // set the color scale
 
-  // Loop through each symbol / key
-  dataNest.forEach(function(d) {
-      lineGraph.append("path")
-          .attr("class", "line")
-          .attr("data-legend",function() { return countryName(d.key); })
-          .style("stroke", function() { // Add dynamically
-                return d.color = color(d.key); })
-          .attr("d", valueline(d.values)); 
+  
 
-  });
+  var lastvalues=[];
+  x_scaleLine.domain(medalsOverTime.map(function(d) { return d.year; }));
+  y_scaleLine.domain([0, d3.max(medalsOverTime, function(d) { return d.count; })]);
 
-  d3.select("svg.linegraph")
-    .append("text")
-    .attr("x", (lineGraphWidth / 2))
-    .attr("y", margin.top-18)
-    .attr("text-anchor", "middle")
-    .style("font-size", "16px")
-    .text("Medal Count Over Time") //TODO
+  // Define the axes
+  xAxisLine = d3.svg.axis().scale(x_scaleLine)
+      .orient("bottom");
+  lineGraph.append("svg:g")
+      .attr("class", "x axis");
 
-  // Add the X Axis
-  lineGraph.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + lineGraphHeight + ")")
-      .call(xAxis);
+  yAxisLine = d3.svg.axis().scale(y_scaleLine)
+      .orient("left");
+  lineGraph.append("svg:g")
+      .attr("class", "y axis");
 
-  // Add the Y Axis
-  lineGraph.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);
+  // Define the line
+  valueline = d3.svg.line()
+      .x(function(d) { return x_scaleLine(d.year); })
+      .y(function(d) { return y_scaleLine(d.count); });
 
+
+
+  var thegraph = lineGraph.selectAll(".thegraph")
+      .data(dataNest)
+
+  var linecolor = d3.scale.category20();
+  //Enter new country lines
+  var thegraphEnter = thegraph.enter().append("g")
+    .attr("clip-path", "url(#clip)")
+    .attr("class", "thegraph")
+      .attr('id',function(d){ return d.key+"-line"; })
+    .style("stroke-width",2.5)
+
+  thegraphEnter.append("path")
+      .attr("class", "line")
+        .attr("data-legend",function(d) { return countryName(d.key); })
+        .style("stroke", function(d) { return linecolor(d.key); })
+        .attr("d", function(d) { return valueline(d.values); })
+        .transition()
+        .duration(2000)
+        .attrTween('d',function (d){
+            var interpolate = d3.scale.quantile()
+              .domain([0,1])
+              .range(d3.range(1, d.values.length+1));
+            return function(t){
+              return valueline(d.values.slice(0, interpolate(t)));
+          };
+        });
+
+  //remove old country lines
+  thegraph.exit().remove();
+
+  // set variable for updating visualization
+  var thegraphUpdate = d3.transition(thegraph);
+  
+  // change values of pat
+  thegraphUpdate.select("path")
+    .attr("d", function(d, i) {       
+        lastvalues[i]=d.values[d.values.length-1].value;         
+        lastvalues.sort(function (a,b){return b-a});
+      
+        return valueline(d.values);
+    });
+
+
+  d3.transition(lineGraph).select(".y.axis")
+    .call(yAxisLine);   
+        
+  d3.transition(lineGraph).select(".x.axis")
+    .attr("transform", "translate(0," + lineGraphHeight + ")")
+      .call(xAxisLine);
+
+  lineGraph.select(".legend").remove();
   legend = lineGraph.append("g")
     .attr("class","legend")
     .attr("transform","translate(" + (lineGraphWidth-150) + ",30)")
@@ -421,3 +466,4 @@ console.log(medalsOverTime);
     .attr("data-style-padding",10)
     .call(d3.legend)
 }
+
