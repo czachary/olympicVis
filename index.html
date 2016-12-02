@@ -25,6 +25,7 @@
 
     <script src="map.js"></script>
     <script src="vis.js"></script>
+    <script src="d3/d3.legend.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -151,7 +152,13 @@
   }
 
   .line {
-    transform: translateX(30px);
+    transform: translateX(13px);
+  }
+
+  .legend rect {
+    fill:white;
+    stroke:black;
+    opacity:0.8;
   }
 
 </style>

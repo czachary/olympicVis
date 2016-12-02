@@ -16,6 +16,9 @@ var tooltip = d3.select("body").append("div")
 
 var datasets = {}
 
+var lineGraphCountries = [];
+var numCushionYears = 4;
+
 
 //*****INITIALIZE DISPLAY & GET DATA********//
 
@@ -81,6 +84,7 @@ function sliderChange(yearSelected) {
   prepareAndFilterData();
   stackedBarChart(barMoveDuration);
   updateMapContainer();
+  updateLineGraph();
 }
 
 //*******PREPARE DATA**********/
@@ -105,6 +109,7 @@ function onDataArrival(error, data) {
 
   stackedBarChart();
   updateMapContainer();
+  lineGraphCountries = ["GRE"]; //default to Greece, 1896
   updateLineGraph();
 }
 
@@ -292,27 +297,61 @@ function color(medalType) {
 
 
 ////***LINE GRAPH
+function updateLineGraphCountries(countryId) {
+
+  countryIndex = lineGraphCountries.indexOf(countryId);
+  if(countryIndex != -1) { //if in array, remove
+    lineGraphCountries.splice(countryIndex, 1);
+    updateLineGraph();
+  } else if (lineGraphCountries.length < 5) { //else add if less than 5
+    lineGraphCountries.push(countryId);
+    updateLineGraph();
+  }
+console.log(lineGraphCountries);
+}
+
 
 function updateLineGraph() {
 
-  var countryMedals = datasets["countries"]["USA"]  //TODO: default to top medal earner of year, allow country selection
-
+  d3.select('#linegraph_container').selectAll("*").remove();
   var medalsOverTime = [];
-  for(i=0; i<5; i++) //TODO: define which years we actually want, instead of curr + next 4
-  {
-    medalsOverTime[i] = {};
-    medalsOverTime[i]["year"] = year+(i*4);
-    medalsOverTime[i]["count"] = 0;
-    countryMedals.forEach(function(d) {
-      if (d.Year == year+(i*4)) medalsOverTime[i]["count"]++;
-    })
-  }
 
-  console.log(medalsOverTime);
+  //get year range to display
+  startYear = year - (numCushionYears*4);
+  endYear = year + (numCushionYears*4);
+  if (startYear < 1896) { startYear = 1896; endYear = 1928; }
+  if (endYear > 2008) { startYear = 1976; endYear = 2008; }
 
 
-  var x = d3.scale.ordinal().rangeRoundBands([0, width], .5, 0);//.range([0, width]);
-  var y = d3.scale.linear().range([height, 0]);
+  lineGraphCountries.forEach(function(d) {
+
+    for(currYear=startYear; currYear<=endYear; currYear+=4) {
+      newEntry = {};
+      newEntry["country"] = d;
+      newEntry["year"] = currYear;
+
+      count = 0;
+      if (datasets["countries"][d] != null) {
+        datasets["countries"][d].forEach(function(medal) {
+            medalYear = +medal.Year;
+            if(medalYear == currYear) {
+              count++;
+            }
+          })
+      }
+
+      newEntry["count"] = count;
+      medalsOverTime.push(newEntry);
+    }
+
+  });
+
+
+console.log(medalsOverTime);
+
+  var lineGraphWidth = 500, lineGraphHeight = 300;
+  var x = d3.scale.ordinal().rangeRoundBands([0, lineGraphWidth], .5, 0);
+  var y = d3.scale.linear().range([lineGraphHeight, 0]);
 
   // Define the axes
   var xAxis = d3.svg.axis().scale(x)
@@ -325,9 +364,6 @@ function updateLineGraph() {
   var valueline = d3.svg.line()
       .x(function(d) { return x(d.year); })
       .y(function(d) { return y(d.count); });
-      
-
-  var lineGraphWidth = 500, lineGraphHeight = 500;
 
   lineGraph = d3.select('#linegraph_container')
     .append("svg")
@@ -335,28 +371,42 @@ function updateLineGraph() {
       .attr("width", lineGraphWidth + margin.left + margin.right)
       .attr("height", lineGraphHeight + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  d3.select("svg.linegraph")
-    .append("text")
-    .attr("x", (width / 2))
-    .attr("y", margin.top-18)
-    .attr("text-anchor", "middle")
-    .style("font-size", "16px")
-    .text("Medal Count Over Time: COUNTRY NAME") //TODO
 
   x.domain(medalsOverTime.map(function(d) { return d.year; }));
   y.domain([0, d3.max(medalsOverTime, function(d) { return d.count; })]);
 
-  // Add the valueline path
-  lineGraph.append("path")
-      .attr("class", "line")
-      .attr("d", valueline(medalsOverTime));
+  // Nest the entries by country
+  var dataNest = d3.nest()
+      .key(function(d) {return d.country;})
+      .entries(medalsOverTime);
+
+  var color = d3.scale.category10();  // set the color scale
+
+  // Loop through each symbol / key
+  dataNest.forEach(function(d) {
+      lineGraph.append("path")
+          .attr("class", "line")
+          .attr("data-legend",function() { return countryName(d.key); })
+          .style("stroke", function() { // Add dynamically
+                return d.color = color(d.key); })
+          .attr("d", valueline(d.values)); 
+
+  });
+
+  d3.select("svg.linegraph")
+    .append("text")
+    .attr("x", (lineGraphWidth / 2))
+    .attr("y", margin.top-18)
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px")
+    .text("Medal Count Over Time") //TODO
 
   // Add the X Axis
   lineGraph.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
+      .attr("transform", "translate(0," + lineGraphHeight + ")")
       .call(xAxis);
 
   // Add the Y Axis
@@ -364,4 +414,10 @@ function updateLineGraph() {
       .attr("class", "y axis")
       .call(yAxis);
 
+  legend = lineGraph.append("g")
+    .attr("class","legend")
+    .attr("transform","translate(" + (lineGraphWidth-150) + ",30)")
+    .style("font-size","11px")
+    .attr("data-style-padding",10)
+    .call(d3.legend)
 }

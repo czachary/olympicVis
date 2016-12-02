@@ -43,6 +43,7 @@ function initWorldMap() {
       //Clicking
       datamap.svg.selectAll(".datamaps-subunit").on('click', function(geo) {
           console.log(geo.properties.name + " was clicked");
+          updateLineGraphCountries(convertToOlympicCode(getCountry().id));
       });
 
       //Mouse Over
@@ -187,4 +188,67 @@ function countryName(country) {
     .each(function(d) { names.push(d.properties.name); })
 
   return names.length > 0 ? names[0] : country;
+}
+
+
+
+
+//converts the ISO standard code used by datamaps to the olympic IOC country code
+//for use in line graph
+function convertToOlympicCode(code) {
+  switch (code) {
+    case "DZA": return "ALG"; //algeria
+    case "BHS": return "BAH"; //bahamas
+    case "BRB": return "BAR"; //barbados
+    case "BMU": return "BER"; //bermuda
+    case "BGR": return "BUL"; //bulgaria
+    case "CHL": return "CHI"; //chile
+    case "HRV": return "CRO"; //croatia
+    case "CRI": return "CRC"; //costa rica
+    case "DNK": return "DEN"; //denmark
+    case "DEU": return "GER"; //germany
+    case "GRC": return "GRE"; //greece
+    case "HTI": return "HAI"; //haiti
+    case "IDN": return "INA"; //indonesia
+    case "IRN": return "IRI"; //iran
+    case "KWT": return "KUW"; //kuwait
+    case "LVA": return "LAT"; //latvia
+    case "LBN": return "LIB"; //lebanon
+    case "MUS": return "MRI"; //mauritius
+    case "MYS": return "MAS"; //malaysia
+    case "MNG": return "MGL"; //mongolia
+    case "NER": return "NIG"; //niger
+    case "NGA": return "NGR"; //nigeria
+    case "NLD": return "NED"; //netherlands
+    case "PRY": return "PAR"; //paraguay
+    case "PHL": return "PHI"; //philippines
+    case "PRT": return "POR"; //portugal
+    case "PRI": return "PUR"; //puerto rico
+    case "SAU": return "KSA"; //saudi arabia
+    case "SGP": return "SIN"; //singapore
+    case "SVN": return "SLO"; //slovenia
+    case "ZAF": return "RSA"; //south africa
+    case "LKA": return "SRI"; //sri lanka
+    case "SDN": return "SUD"; //sudan
+    case "CHE": return "SUI"; //switzerland
+    case "TWN": return "TPE"; //taiwan
+    case "TZA": return "TAN"; //tanzania
+    case "TGO": return "TOG"; //togo
+    case "TON": return "TGA"; //tonga
+    case "TTO": return "TRI"; //trinidad and tobago
+    case "ARE": return "UAE"; //united arab emirates
+    case "URY": return "URU"; //uruguay
+    case "VIR": return "ISV"; //u.s. virgin islands
+    case "VNM": return "VIE"; //vietnam
+    case "ZMB": return "ZAM"; //zambia
+    case "ZWE": return "ZIM"; //zimbabwe
+    case "DEU": return "EUA"; //unified team of germany-> germany
+    case "CZE": return "TCH"; //czechoslovakia -> czech republic
+    //case "CZE": return "BOH"; //bohemia -> czech republic //TODO: fix CZE
+    case "AUS": return "ANZ"; //australia -> australasia
+    case "RUS": return "URS"; //soviet union -> russia
+    //case "RUS": return "RU1"; //russian empire -> russia //TODO: fix RUS
+    case "BIH": return "YUG"; //yugoslavia -> bosnia and herzegovina
+    default: return code;
+  }
 }
