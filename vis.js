@@ -418,7 +418,6 @@ function redraw() {
 
   thegraphEnter.append("path")
       .attr("class", "line")
-        .attr("data-legend",function(d) { return countryName(d.key); })
         .style("stroke", function(d) { return assignedColors[d.key]; })
         .attr("d", function(d) { return valueline(d.values); })
         .transition()
@@ -440,6 +439,7 @@ function redraw() {
   
   // change values of pat
   thegraphUpdate.select("path")
+    .style("stroke", function(d) { return assignedColors[d.key]; })
     .attr("d", function(d, i) {       
         lastvalues[i]=d.values[d.values.length-1].value;         
         lastvalues.sort(function (a,b){return b-a});
@@ -455,17 +455,12 @@ function redraw() {
     .attr("transform", "translate(0," + lineGraphHeight + ")")
       .call(xAxisLine);
 
-  lineGraph.select(".legend").remove();
-  legend = lineGraph.append("g")
-    .attr("class","legend")
-    .attr("transform","translate(" + (lineGraphWidth-150) + ",30)")
-    .style("font-size","11px")
-    .attr("data-style-padding",10)
-    .call(d3.legend)
 }
+
 
 var lineColors = ["#008080", "#FF0000", "#800080", "#808080", "#FFFF00"];
 var assignedColors = [];
+
 function updateLineGraphColors() {
   var newColors = [];
 
