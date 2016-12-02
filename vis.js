@@ -338,6 +338,7 @@ function updateLineGraphCountries(countryId) {
 }
 
 function updateLineGraph() {
+  updateLineGraphColors();
   d3.transition()
       .duration(1500)
       .each(redraw);
@@ -383,9 +384,6 @@ function redraw() {
       .key(function(d) {return d.country;})
       .entries(medalsOverTime);
 
-
-  
-
   var lastvalues=[];
   x_scaleLine.domain(medalsOverTime.map(function(d) { return d.year; }));
   y_scaleLine.domain([0, d3.max(medalsOverTime, function(d) { return d.count; })]);
@@ -411,7 +409,6 @@ function redraw() {
   var thegraph = lineGraph.selectAll(".thegraph")
       .data(dataNest)
 
-  var linecolor = d3.scale.category20();
   //Enter new country lines
   var thegraphEnter = thegraph.enter().append("g")
     .attr("clip-path", "url(#clip)")
@@ -422,7 +419,7 @@ function redraw() {
   thegraphEnter.append("path")
       .attr("class", "line")
         .attr("data-legend",function(d) { return countryName(d.key); })
-        .style("stroke", function(d) { return linecolor(d.key); })
+        .style("stroke", function(d) { return assignedColors[d.key]; })
         .attr("d", function(d) { return valueline(d.values); })
         .transition()
         .duration(2000)
@@ -465,5 +462,31 @@ function redraw() {
     .style("font-size","11px")
     .attr("data-style-padding",10)
     .call(d3.legend)
+}
+
+var lineColors = ["#008080", "#FF0000", "#800080", "#808080", "#FFFF00"];
+var assignedColors = [];
+function updateLineGraphColors() {
+  var newColors = [];
+
+  //copy over countries remaining
+  for(var key in assignedColors) {
+    if(lineGraphCountries.includes(key)) { newColors[key] = assignedColors[key]; }
+  }
+
+  //assign color to new countries
+  for(i=0;i<lineGraphCountries.length;i++) {
+    if(!Object.keys(newColors).includes(lineGraphCountries[i])) {
+      for(j=0;j<lineColors.length;j++) {
+        found = false;
+        for(var key in newColors) {
+          if(newColors[key] == lineColors[j]) { found = true; break; }
+        }
+        if(!found) newColors[lineGraphCountries[i]] = lineColors[j];
+      }
+    }
+  }
+
+  assignedColors = newColors;
 }
 

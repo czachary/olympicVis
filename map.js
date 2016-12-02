@@ -242,13 +242,13 @@ function convertToOlympicCode(code) {
     case "VNM": return "VIE"; //vietnam
     case "ZMB": return "ZAM"; //zambia
     case "ZWE": return "ZIM"; //zimbabwe
-    case "DEU": return "EUA"; //unified team of germany-> germany
-    case "CZE": return "TCH"; //czechoslovakia -> czech republic
-    //case "CZE": return "BOH"; //bohemia -> czech republic //TODO: fix CZE
+    case "DEU": return "EUA"; //germany -> unified team of germany
+    case "CZE": return "TCH"; //czech republic -> czechoslovakia
+    //case "CZE": return "BOH"; //czech republic -> bohemia //TODO: fix CZE
     case "AUS": return "ANZ"; //australia -> australasia
-    case "RUS": return "URS"; //soviet union -> russia
-    //case "RUS": return "RU1"; //russian empire -> russia //TODO: fix RUS
-    case "BIH": return "YUG"; //yugoslavia -> bosnia and herzegovina
+    case "RUS": return "URS"; //russia -> soviet union
+    //case "RUS": return "RU1"; //russia -> russian empire //TODO: fix RUS
+    case "BIH": return "YUG"; //bosnia and herzegovina -> yugoslavia
     default: return code;
   }
 }
