@@ -16,7 +16,7 @@ var tooltip = d3.select("body").append("div")
 
 var datasets = {}
 
-var lineGraphWidth = 500, lineGraphHeight = 300;
+var lineGraphWidth = 500, lineGraphHeight = 150;
 var lineGraph, valueline;
 var lineGraphCountries = [];
 var numCushionYears = 4;
@@ -43,15 +43,15 @@ function initStackedBarChart() {
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + (margin.top-30) + ")");
 
-  d3.select("svg.stackedBar")
-    .append("text")
-    .attr("x", (width / 2))
-    .attr("y", margin.top-18)
-    .attr("text-anchor", "middle")
-    .style("font-size", "16px")
-    .text("Total Medal Count by Country")
+  // d3.select("svg.stackedBar")
+  //   .append("text")
+  //   .attr("x", (width / 2))
+  //   .attr("y", margin.top-18)
+  //   .attr("text-anchor", "middle")
+  //   .style("font-size", "16px")
+  //   .text("Total Medal Count by Country")
 
   // Set x, y and colors
   x_scale = d3.scale.linear()
@@ -104,7 +104,7 @@ function initLineGraph() {
     .attr("y", margin.top-18)
     .attr("text-anchor", "middle")
     .style("font-size", "16px")
-    .text("Medal Count Over Time")
+    .text("Compare Country Medal Counts Over Time")
 }
 
 //******YEAR CHANGE******//
@@ -395,7 +395,8 @@ function redraw() {
       .attr("class", "x axis");
 
   yAxisLine = d3.svg.axis().scale(y_scaleLine)
-      .orient("left");
+      .orient("left")
+      .ticks(5);
   lineGraph.append("svg:g")
       .attr("class", "y axis");
 
@@ -461,31 +462,30 @@ function redraw() {
     .attr("class", "legend")
     .attr("height", 100)
     .attr("width", 100)
-    .attr('transform', 'translate(0,50)')    
       
     
-    legend.selectAll('rect')
-      .data(dataNest)
-      .enter()
-      .append("rect")
-    .attr("x", lineGraphWidth - 100)
-      .attr("y", function(d, i){ return i *  20;})
-    .attr("width", 10)
-    .attr("height", 10)
-    .style("fill", function(d) { return assignedColors[d.key]; })
-      
-    legend.selectAll('text')
-      .data(dataNest)
-      .enter()
-      .append("text")
-    .attr("x", lineGraphWidth - 85)
-      .attr("y", function(d, i){ return i *  20 + 9;})
-    .text(function(d) { return countryName(d.key); })
+  legend.selectAll('rect')
+    .data(dataNest)
+    .enter()
+    .append("rect")
+  .attr("x", lineGraphWidth - 100)
+    .attr("y", function(d, i){ return i *  12;})
+  .attr("width", 10)
+  .attr("height", 10)
+  .style("fill", function(d) { return assignedColors[d.key]; })
+    
+  legend.selectAll('text')
+    .data(dataNest)
+    .enter()
+    .append("text")
+  .attr("x", lineGraphWidth - 85)
+    .attr("y", function(d, i){ return i *  12 + 9;})
+  .text(function(d) { return countryName(d.key); })
 
 }
 
 
-var lineColors = ["#008080", "#FF0000", "#800080", "#808080", "#FFFF00"];
+var lineColors = ["#008080", "#808080", "#800080", "#FF0000", "#008000"];
 var assignedColors = [];
 
 function updateLineGraphColors() {
