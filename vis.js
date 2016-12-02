@@ -455,6 +455,33 @@ function redraw() {
     .attr("transform", "translate(0," + lineGraphHeight + ")")
       .call(xAxisLine);
 
+  //TODO: legend
+  d3.select(".legend").remove();
+  var legend = lineGraph.append("g")
+    .attr("class", "legend")
+    .attr("height", 100)
+    .attr("width", 100)
+    .attr('transform', 'translate(0,50)')    
+      
+    
+    legend.selectAll('rect')
+      .data(dataNest)
+      .enter()
+      .append("rect")
+    .attr("x", lineGraphWidth - 100)
+      .attr("y", function(d, i){ return i *  20;})
+    .attr("width", 10)
+    .attr("height", 10)
+    .style("fill", function(d) { return assignedColors[d.key]; })
+      
+    legend.selectAll('text')
+      .data(dataNest)
+      .enter()
+      .append("text")
+    .attr("x", lineGraphWidth - 85)
+      .attr("y", function(d, i){ return i *  20 + 9;})
+    .text(function(d) { return countryName(d.key); })
+
 }
 
 
