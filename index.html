@@ -10,7 +10,7 @@
     <div id="top_panel">
       <span>
         <h1 class="title">Modern Summer Olympic Games</h1>
-        <h3 class="subtitle" style="display:inline-block">1896-2008</h3> <!-- TODO: show selected year/host country -->
+        <h3 id="hostInfo" class="subtitle" style="display:inline-block"></h3>
       </span>
       <span class="timeline">
         <div id="slider"></div>
@@ -41,6 +41,8 @@
 
     <script>
     $( function() {
+      $('#linegraph_container').append($('<div />', { 'class': 'chart-tip'}));
+      document.getElementById("hostInfo").innerHTML = "1896: Athens, Greece";
       $( "#slider" ).slider({
           value: 1896,
           min: 1896,

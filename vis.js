@@ -1,6 +1,7 @@
 
 var margin = {top: 55, right: 160, bottom: 35, left: 140};
 var year = 1896;
+var currCity = "Athens", currCountry = "Greece";
 var init_order = ["Gold", "Silver", "Bronze"];
 var stack_order = init_order.slice();
 
@@ -12,6 +13,9 @@ var barMoveDuration = 800;
 
 var tooltip = d3.select("body").append("div")
   .attr("class", "tooltip")
+  .style("opacity", 0);
+var lineGraphTooltip = d3.select("body").append("div") 
+  .attr("class", "tooltip")       
   .style("opacity", 0);
 
 var datasets = {}
@@ -31,6 +35,7 @@ function init() {
   initLineGraph();
 
   d3.csv("OlympicData.csv", onDataArrival);
+  d3.csv("hostData.csv", getHostData);
 }
 
 function initStackedBarChart() {
@@ -109,14 +114,34 @@ function initLineGraph() {
 
 //******YEAR CHANGE******//
 function sliderChange(yearSelected) {
-  year = yearSelected;
+  updateYearInfo(yearSelected);
   prepareAndFilterData();
   stackedBarChart(barMoveDuration);
   updateMapContainer();
   updateLineGraph();
 }
+function updateYearInfo(yearSelected) {
+  year = yearSelected;
+  datasets["hosts"].forEach(function(d) {
+    if(d.Year == year) {
+      currCity = d.City;
+      currCountry = d.Country;
+    }
+  })
+  document.getElementById("hostInfo").innerHTML = year + ": " + currCity + ", " + currCountry;
+}
 
 //*******PREPARE DATA**********/
+function getHostData(error, data) {
+  if (error) {
+    console.warn(error);
+    return
+  }
+  datasets["hosts"] = data;
+  datasets["hosts"].forEach(function(d) {
+    d.Year = +d.Year;
+  })
+}
 function onDataArrival(error, data) {
   if (error) {
     console.warn(error)
@@ -406,7 +431,7 @@ function redraw() {
       .y(function(d) { return y_scaleLine(d.count); });
 
 
-
+  d3.selectAll(".thegraph").remove();
   var thegraph = lineGraph.selectAll(".thegraph")
       .data(dataNest)
 
@@ -421,16 +446,6 @@ function redraw() {
       .attr("class", "line")
         .style("stroke", function(d) { return assignedColors[d.key]; })
         .attr("d", function(d) { return valueline(d.values); })
-        .transition()
-        .duration(2000)
-        .attrTween('d',function (d){
-            var interpolate = d3.scale.quantile()
-              .domain([0,1])
-              .range(d3.range(1, d.values.length+1));
-            return function(t){
-              return valueline(d.values.slice(0, interpolate(t)));
-          };
-        });
 
   //remove old country lines
   thegraph.exit().remove();
@@ -456,13 +471,42 @@ function redraw() {
     .attr("transform", "translate(0," + lineGraphHeight + ")")
       .call(xAxisLine);
 
-  //TODO: legend
+
+  //TOOLTIPS
+  lineGraph.selectAll("circle").remove();
+  lineGraph
+    .selectAll("circle")
+    .data(medalsOverTime)
+    .enter().append("circle")
+    .attr("fill", function(d) { return assignedColors[d.country]; })
+    .attr("r", 3)
+    .attr("cx", function(d) { return x_scaleLine(d.year)+13; })
+    .attr("cy", function(d) { return y_scaleLine(d.count); })
+    .on("mouseover", function(d) {
+      lineGraphTooltip.transition()
+        .duration(200)
+        .style("opacity", 0.75);
+    })
+    .on("mouseout", function(d) {
+      lineGraphTooltip.transition()
+          .duration(200)
+          .style("opacity", 0);
+    })
+    .on("mousemove", function(d) {
+      lineGraphTooltip
+        .html(d.count)
+        .style("left", (d3.event.pageX-10) + "px")
+        .style("top", (d3.event.pageY-30) + "px");
+        lineGraphtooltip.style("opacity", 1);
+    });
+
+
+  //LEGEND
   d3.select(".legend").remove();
   var legend = lineGraph.append("g")
     .attr("class", "legend")
     .attr("height", 100)
     .attr("width", 100)
-      
     
   legend.selectAll('rect')
     .data(dataNest)
@@ -511,4 +555,3 @@ function updateLineGraphColors() {
 
   assignedColors = newColors;
 }
-
