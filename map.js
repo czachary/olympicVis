@@ -244,10 +244,10 @@ function convertToOlympicCode(code) {
     case "ZWE": return "ZIM"; //zimbabwe
     case "DEU": return "EUA"; //germany -> unified team of germany
     case "CZE": return "TCH"; //czech republic -> czechoslovakia
-    //case "CZE": return "BOH"; //czech republic -> bohemia //TODO: fix CZE
+    //case "CZE": return "BOH"; //czech republic -> bohemia //TODO: fix CZE, DONE: check added in lineGraph redraw()
     case "AUS": return "ANZ"; //australia -> australasia
     case "RUS": return "URS"; //russia -> soviet union
-    //case "RUS": return "RU1"; //russia -> russian empire //TODO: fix RUS
+    //case "RUS": return "RUS"; //russia -> russian empire //TODO: fix RUS, DONE: check added in lineGraph redraw()
     case "BIH": return "YUG"; //bosnia and herzegovina -> yugoslavia
     default: return code;
   }

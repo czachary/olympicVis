@@ -380,9 +380,7 @@ function redraw() {
   if (startYear < 1896) { startYear = 1896; endYear = 1928; }
   if (endYear > 2008) { startYear = 1976; endYear = 2008; }
 
-
   lineGraphCountries.forEach(function(d) {
-
     for(currYear=startYear; currYear<=endYear; currYear+=4) {
       newEntry = {};
       newEntry["country"] = d;
@@ -391,11 +389,27 @@ function redraw() {
       count = 0;
       if (datasets["countries"][d] != null) {
         datasets["countries"][d].forEach(function(medal) {
+          medalYear = +medal.Year;
+          if(medalYear == currYear) {
+            count++;
+          }
+        })
+        if(d=="URS") { //SovietUnion + Russia 
+          datasets["countries"]["RUS"].forEach(function(medal) {
             medalYear = +medal.Year;
             if(medalYear == currYear) {
               count++;
             }
           })
+        }
+        if(d=="TCH") { //Czechoslovakia + Bohemia 
+          datasets["countries"]["BOH"].forEach(function(medal) {
+            medalYear = +medal.Year;
+            if(medalYear == currYear) {
+              count++;
+            }
+          })
+        }
       }
 
       newEntry["count"] = count;
@@ -497,7 +511,7 @@ function redraw() {
         .html(d.count)
         .style("left", (d3.event.pageX-10) + "px")
         .style("top", (d3.event.pageY-30) + "px");
-        lineGraphtooltip.style("opacity", 1);
+      lineGraphTooltip.style("opacity", 1);
     });
 
 
@@ -524,7 +538,7 @@ function redraw() {
     .append("text")
   .attr("x", lineGraphWidth - 85)
     .attr("y", function(d, i){ return i *  12 + 9;})
-  .text(function(d) { return countryName(d.key); })
+  .text(function(d) { if(countryName(d.key)=="Soviet Union") return "USSR/Russia"; else return countryName(d.key); })
 
 }
 
