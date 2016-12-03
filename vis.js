@@ -1,5 +1,6 @@
 
 var margin = {top: 55, right: 160, bottom: 35, left: 140};
+var lineGraphMargins = {top: 55, right: 160, bottom: 35, left: 50};
 var year = 1896;
 var currCity = "Athens", currCountry = "Greece";
 var init_order = ["Gold", "Silver", "Bronze"];
@@ -98,15 +99,15 @@ function initLineGraph() {
   lineGraph = d3.select('#linegraph_container')
     .append("svg")
       .attr("class", "linegraph")
-      .attr("width", lineGraphWidth + margin.left + margin.right)
-      .attr("height", lineGraphHeight + margin.top + margin.bottom)
+      .attr("width", lineGraphWidth + lineGraphMargins.left + lineGraphMargins.right)
+      .attr("height", lineGraphHeight + lineGraphMargins.top + lineGraphMargins.bottom)
     .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("transform", "translate(" + lineGraphMargins.left + "," + lineGraphMargins.top + ")");
 
   d3.select("svg.linegraph")
     .append("text")
-    .attr("x", (lineGraphWidth / 2))
-    .attr("y", margin.top-18)
+    .attr("x", lineGraphMargins.left+150)
+    .attr("y", lineGraphMargins.top-18)
     .attr("text-anchor", "middle")
     .style("font-size", "16px")
     .text("Compare Country Medal Counts Over Time")
