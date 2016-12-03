@@ -1,11 +1,13 @@
 
 var margin = {top: 55, right: 160, bottom: 35, left: 140};
+var lineGraphMargins = {top: 55, right: 160, bottom: 35, left: 50};
 var year = 1896;
+var currCity = "Athens", currCountry = "Greece";
 var init_order = ["Gold", "Silver", "Bronze"];
 var stack_order = init_order.slice();
 
 var width, height;
-var barChart, lineGraph;
+var barChart;
 var x_scale, y_scale, xAxis, yAxis;
 
 var barMoveDuration = 800;
@@ -13,8 +15,17 @@ var barMoveDuration = 800;
 var tooltip = d3.select("body").append("div")
   .attr("class", "tooltip")
   .style("opacity", 0);
+var lineGraphTooltip = d3.select("body").append("div") 
+  .attr("class", "tooltip")       
+  .style("opacity", 0);
 
 var datasets = {}
+
+var lineGraphWidth = 500, lineGraphHeight = 150;
+var lineGraph, valueline;
+var lineGraphCountries = [];
+var numCushionYears = 4;
+var x_scaleLine, y_scaleLine, xAxisLine, yAxisLine;
 
 
 //*****INITIALIZE DISPLAY & GET DATA********//
@@ -22,8 +33,10 @@ var datasets = {}
 function init() {
   initStackedBarChart();
   initWorldMap();
+  initLineGraph();
 
   d3.csv("OlympicData.csv", onDataArrival);
+  d3.csv("hostData.csv", getHostData);
 }
 
 function initStackedBarChart() {
@@ -36,15 +49,15 @@ function initStackedBarChart() {
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + (margin.top-30) + ")");
 
-  d3.select("svg.stackedBar")
-    .append("text")
-    .attr("x", (width / 2))
-    .attr("y", margin.top-18)
-    .attr("text-anchor", "middle")
-    .style("font-size", "16px")
-    .text("Total Medal Count by Country")
+  // d3.select("svg.stackedBar")
+  //   .append("text")
+  //   .attr("x", (width / 2))
+  //   .attr("y", margin.top-18)
+  //   .attr("text-anchor", "middle")
+  //   .style("font-size", "16px")
+  //   .text("Total Medal Count by Country")
 
   // Set x, y and colors
   x_scale = d3.scale.linear()
@@ -75,15 +88,61 @@ function initStackedBarChart() {
     .call(xAxis);
 }
 
+function initLineGraph() {
+
+  x_scaleLine = d3.scale.ordinal().rangeRoundBands([0, lineGraphWidth], .5, 0);
+  y_scaleLine = d3.scale.linear().range([lineGraphHeight, 0]);
+
+  var bluescale4 = ["#8BA9D0", "#6A90C1", "#066CA9", "#004B8C"];
+  linegraphcolor = d3.scale.ordinal().range(bluescale4);
+
+  lineGraph = d3.select('#linegraph_container')
+    .append("svg")
+      .attr("class", "linegraph")
+      .attr("width", lineGraphWidth + lineGraphMargins.left + lineGraphMargins.right)
+      .attr("height", lineGraphHeight + lineGraphMargins.top + lineGraphMargins.bottom)
+    .append("g")
+      .attr("transform", "translate(" + lineGraphMargins.left + "," + lineGraphMargins.top + ")");
+
+  d3.select("svg.linegraph")
+    .append("text")
+    .attr("x", lineGraphMargins.left+150)
+    .attr("y", lineGraphMargins.top-18)
+    .attr("text-anchor", "middle")
+    .style("font-size", "16px")
+    .text("Compare Country Medal Counts Over Time")
+}
+
 //******YEAR CHANGE******//
 function sliderChange(yearSelected) {
-  year = yearSelected;
+  updateYearInfo(yearSelected);
   prepareAndFilterData();
   stackedBarChart(barMoveDuration);
   updateMapContainer();
+  updateLineGraph();
+}
+function updateYearInfo(yearSelected) {
+  year = yearSelected;
+  datasets["hosts"].forEach(function(d) {
+    if(d.Year == year) {
+      currCity = d.City;
+      currCountry = d.Country;
+    }
+  })
+  document.getElementById("hostInfo").innerHTML = year + ": " + currCity + ", " + currCountry;
 }
 
 //*******PREPARE DATA**********/
+function getHostData(error, data) {
+  if (error) {
+    console.warn(error);
+    return
+  }
+  datasets["hosts"] = data;
+  datasets["hosts"].forEach(function(d) {
+    d.Year = +d.Year;
+  })
+}
 function onDataArrival(error, data) {
   if (error) {
     console.warn(error)
@@ -105,6 +164,7 @@ function onDataArrival(error, data) {
 
   stackedBarChart();
   updateMapContainer();
+  lineGraphCountries = ["GRE"]; //default to Greece, 1896
   updateLineGraph();
 }
 
@@ -199,6 +259,10 @@ function stackedBarChart(delayGrow) {
         d1 = data.filter(function(d1) { return countryName(d1.Country) == axisLabel; })[0];
         return unHighlightCountry(d1.Country);
       })
+      .on("click", function(axisLabel) {
+        d1 = data.filter(function(d1) { return countryName(d1.Country) == axisLabel; })[0];
+        updateLineGraphCountries(convertToOlympicCode(d1.Country));
+      })
   });
 
   // Create groups for each series, rects for each segment 
@@ -292,76 +356,224 @@ function color(medalType) {
 
 
 ////***LINE GRAPH
+function updateLineGraphCountries(countryId) {
+  countryIndex = lineGraphCountries.indexOf(countryId);
+  if(countryIndex != -1) { //if in array, remove
+    lineGraphCountries.splice(countryIndex, 1);
+    updateLineGraph();
+  } else if (lineGraphCountries.length < 5) { //else add if less than 5
+    lineGraphCountries.push(countryId);
+    updateLineGraph();
+  }
+}
 
 function updateLineGraph() {
+  updateLineGraphColors();
+  d3.transition()
+      .duration(1500)
+      .each(redraw);
+}
 
-  var countryMedals = datasets["countries"]["USA"]  //TODO: default to top medal earner of year, allow country selection
+
+function redraw() {
 
   var medalsOverTime = [];
-  for(i=0; i<5; i++) //TODO: define which years we actually want, instead of curr + next 4
-  {
-    medalsOverTime[i] = {};
-    medalsOverTime[i]["year"] = year+(i*4);
-    medalsOverTime[i]["count"] = 0;
-    countryMedals.forEach(function(d) {
-      if (d.Year == year+(i*4)) medalsOverTime[i]["count"]++;
-    })
-  }
 
-  console.log(medalsOverTime);
+  //get year range to display
+  startYear = year - (numCushionYears*4);
+  endYear = year + (numCushionYears*4);
+  if (startYear < 1896) { startYear = 1896; endYear = 1928; }
+  if (endYear > 2008) { startYear = 1976; endYear = 2008; }
 
+  lineGraphCountries.forEach(function(d) {
+    for(currYear=startYear; currYear<=endYear; currYear+=4) {
+      newEntry = {};
+      newEntry["country"] = d;
+      newEntry["year"] = currYear;
 
-  var x = d3.scale.ordinal().rangeRoundBands([0, width], .5, 0);//.range([0, width]);
-  var y = d3.scale.linear().range([height, 0]);
+      count = 0;
+      if (datasets["countries"][d] != null) {
+        datasets["countries"][d].forEach(function(medal) {
+          medalYear = +medal.Year;
+          if(medalYear == currYear) {
+            count++;
+          }
+        })
+        if(d=="URS") { //SovietUnion + Russia 
+          datasets["countries"]["RUS"].forEach(function(medal) {
+            medalYear = +medal.Year;
+            if(medalYear == currYear) {
+              count++;
+            }
+          })
+        }
+        if(d=="TCH") { //Czechoslovakia + Bohemia 
+          datasets["countries"]["BOH"].forEach(function(medal) {
+            medalYear = +medal.Year;
+            if(medalYear == currYear) {
+              count++;
+            }
+          })
+        }
+      }
+
+      newEntry["count"] = count;
+      medalsOverTime.push(newEntry);
+    }
+
+  });
+
+  // Nest the entries by country
+  var dataNest = d3.nest()
+      .key(function(d) {return d.country;})
+      .entries(medalsOverTime);
+
+  var lastvalues=[];
+  x_scaleLine.domain(medalsOverTime.map(function(d) { return d.year; }));
+  y_scaleLine.domain([0, d3.max(medalsOverTime, function(d) { return d.count; })]);
 
   // Define the axes
-  var xAxis = d3.svg.axis().scale(x)
+  xAxisLine = d3.svg.axis().scale(x_scaleLine)
       .orient("bottom");
+  lineGraph.append("svg:g")
+      .attr("class", "x axis");
 
-  var yAxis = d3.svg.axis().scale(y)
-      .orient("left");
+  yAxisLine = d3.svg.axis().scale(y_scaleLine)
+      .orient("left")
+      .ticks(5);
+  lineGraph.append("svg:g")
+      .attr("class", "y axis");
 
   // Define the line
-  var valueline = d3.svg.line()
-      .x(function(d) { return x(d.year); })
-      .y(function(d) { return y(d.count); });
-      
+  valueline = d3.svg.line()
+      .x(function(d) { return x_scaleLine(d.year); })
+      .y(function(d) { return y_scaleLine(d.count); });
 
-  var lineGraphWidth = 500, lineGraphHeight = 500;
 
-  lineGraph = d3.select('#linegraph_container')
-    .append("svg")
-      .attr("class", "linegraph")
-      .attr("width", lineGraphWidth + margin.left + margin.right)
-      .attr("height", lineGraphHeight + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  d3.selectAll(".thegraph").remove();
+  var thegraph = lineGraph.selectAll(".thegraph")
+      .data(dataNest)
 
-  d3.select("svg.linegraph")
-    .append("text")
-    .attr("x", (width / 2))
-    .attr("y", margin.top-18)
-    .attr("text-anchor", "middle")
-    .style("font-size", "16px")
-    .text("Medal Count Over Time: COUNTRY NAME") //TODO
+  //Enter new country lines
+  var thegraphEnter = thegraph.enter().append("g")
+    .attr("clip-path", "url(#clip)")
+    .attr("class", "thegraph")
+      .attr('id',function(d){ return d.key+"-line"; })
+    .style("stroke-width",2.5)
 
-  x.domain(medalsOverTime.map(function(d) { return d.year; }));
-  y.domain([0, d3.max(medalsOverTime, function(d) { return d.count; })]);
-
-  // Add the valueline path
-  lineGraph.append("path")
+  thegraphEnter.append("path")
       .attr("class", "line")
-      .attr("d", valueline(medalsOverTime));
+        .style("stroke", function(d) { return assignedColors[d.key]; })
+        .attr("d", function(d) { return valueline(d.values); })
 
-  // Add the X Axis
-  lineGraph.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+  //remove old country lines
+  thegraph.exit().remove();
 
-  // Add the Y Axis
-  lineGraph.append("g")
-      .attr("class", "y axis")
-      .call(yAxis);
+  // set variable for updating visualization
+  var thegraphUpdate = d3.transition(thegraph);
+  
+  // change values of pat
+  thegraphUpdate.select("path")
+    .style("stroke", function(d) { return assignedColors[d.key]; })
+    .attr("d", function(d, i) {       
+        lastvalues[i]=d.values[d.values.length-1].value;         
+        lastvalues.sort(function (a,b){return b-a});
+      
+        return valueline(d.values);
+    });
 
+
+  d3.transition(lineGraph).select(".y.axis")
+    .call(yAxisLine);   
+        
+  d3.transition(lineGraph).select(".x.axis")
+    .attr("transform", "translate(0," + lineGraphHeight + ")")
+      .call(xAxisLine);
+
+
+  //TOOLTIPS
+  lineGraph.selectAll("circle").remove();
+  lineGraph
+    .selectAll("circle")
+    .data(medalsOverTime)
+    .enter().append("circle")
+    .attr("fill", function(d) { return assignedColors[d.country]; })
+    .attr("r", 3)
+    .attr("cx", function(d) { return x_scaleLine(d.year)+13; })
+    .attr("cy", function(d) { return y_scaleLine(d.count); })
+    .on("mouseover", function(d) {
+      lineGraphTooltip.transition()
+        .duration(200)
+        .style("opacity", 1);
+    })
+    .on("mouseout", function(d) {
+      lineGraphTooltip.transition()
+          .duration(200)
+          .style("opacity", 0);
+    })
+    .on("mousemove", function(d) {
+      lineGraphTooltip
+        .html(d.count)
+        .style("left", (d3.event.pageX-10) + "px")
+        .style("top", (d3.event.pageY-30) + "px");
+      lineGraphTooltip.style("opacity", 1);
+    });
+
+
+  //LEGEND
+  d3.select(".legend").remove();
+  var legend = lineGraph.append("g")
+    .attr("class", "legend")
+    .attr("height", 100)
+    .attr("width", 100)
+    
+  legend.selectAll('rect')
+    .data(dataNest)
+    .enter()
+    .append("rect")
+  .attr("x", lineGraphWidth - 100)
+    .attr("y", function(d, i){ return i *  12;})
+  .attr("width", 10)
+  .attr("height", 10)
+  .style("fill", function(d) { return assignedColors[d.key]; })
+    
+  legend.selectAll('text')
+    .data(dataNest)
+    .enter()
+    .append("text")
+  .attr("x", lineGraphWidth - 85)
+    .attr("y", function(d, i){ return i *  12 + 9;})
+  .text(function(d) {
+    if(countryName(d.key)=="Soviet Union") return "Soviet Union/Russia";
+    else return countryName(d.key);
+  })
+
+}
+
+
+var lineColors = ["#008080", "#808080", "#800080", "#FF0000", "#008000"];
+var assignedColors = [];
+
+function updateLineGraphColors() {
+  var newColors = [];
+
+  //copy over countries remaining
+  for(var key in assignedColors) {
+    if(lineGraphCountries.includes(key)) { newColors[key] = assignedColors[key]; }
+  }
+
+  //assign color to new countries
+  for(i=0;i<lineGraphCountries.length;i++) {
+    if(!Object.keys(newColors).includes(lineGraphCountries[i])) {
+      for(j=0;j<lineColors.length;j++) {
+        found = false;
+        for(var key in newColors) {
+          if(newColors[key] == lineColors[j]) { found = true; break; }
+        }
+        if(!found) newColors[lineGraphCountries[i]] = lineColors[j];
+      }
+    }
+  }
+
+  assignedColors = newColors;
 }

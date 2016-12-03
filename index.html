@@ -8,7 +8,14 @@
 </head>
 <body onload="init()">
     <div id="top_panel">
+<<<<<<< HEAD
       <h1>Summer Olympics Medal Visualization</h1>
+=======
+      <span>
+        <h1 class="title">Modern Summer Olympic Games</h1>
+        <h3 id="hostInfo" class="subtitle" style="display:inline-block"></h3>
+      </span>
+>>>>>>> master
       <span class="timeline">
         <div id="slider"></div>
       </span>
@@ -18,7 +25,13 @@
       &nbsp;
     </div>
 
-    <div id="stackedBar_container"></div>
+    <div id="sportsFilter">Filter by Sport...</div> <!-- TODO -->
+
+    <div class="stackedTitle">Total Medal Count by Country</div>
+    <div class="scroll-on-left">
+      <div id="stackedBar_container"></div>
+    </div>
+
     <div id="map_container"></div>
     <div id="linegraph_container"></div>
 
@@ -28,8 +41,11 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <script>
     $( function() {
+      $('#linegraph_container').append($('<div />', { 'class': 'chart-tip'}));
+      document.getElementById("hostInfo").innerHTML = "1896: Athens, Greece";
       $( "#slider" ).slider({
           value: 1896,
           min: 1896,
@@ -75,14 +91,17 @@
     margin: 20px;
   }
 
+<<<<<<< HEAD
   p {
     font-family: helvetica, sans-serif, tahoma;
     font-size: 13px;
     line-height: 25px;
   }
 
+=======
+>>>>>>> master
 	text {
-    font-family: helvetica, sans-serif, tahoma;
+    font-family: Tahoma;
 		font-size: 11px;
 	}
 
@@ -99,7 +118,7 @@
 
   .spacer {
     width: 100%;
-    height: 100px;
+    height: 85px;
   }
 
   #slider label {
@@ -133,8 +152,13 @@
 
   #map_container {
     position: fixed;
+<<<<<<< HEAD
     top: 130px;
     right: 100px;
+=======
+    top: 180px;
+    right: 20px;
+>>>>>>> master
   }
 
   .datamaps-subunits {
@@ -157,9 +181,47 @@
     stroke-width: 2;
     fill: none;
   }
-
   .line {
-    transform: translateX(30px);
+    transform: translateX(13px);
+  }
+
+
+  #stackedBar_container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    direction: ltr;
+  }
+  .scroll-on-left {
+      overflow-x: auto;
+      direction: rtl;
+  }
+
+
+  .stackedTitle {
+    display: inline-block;
+    font-family: Tahoma;
+    padding-left: 50px;
+  }
+  .title {
+    font-size: x-large;
+    display: inline-block;
+    font-family: Tahoma;
+  }
+  .subtitle {
+    font-family: Tahoma;
+    float: right;
+  }
+
+  .tick {
+    cursor: default;
+  }
+
+  #sportsFilter {
+    height: 20px;
+    width: 300px;
+    display: inline-block;
+    float: right;
   }
 
 </style>
