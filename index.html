@@ -8,7 +8,7 @@
 </head>
 <body onload="init()">
     <div id="top_panel">
-      <h1>Olympic Visualization</h1>
+      <h1>Summer Olympics Medal Visualization</h1>
       <span class="timeline">
         <div id="slider"></div>
       </span>
@@ -76,7 +76,7 @@
   }
 
   p {
-    font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+    font-family: helvetica, sans-serif, tahoma;
     font-size: 13px;
     line-height: 25px;
   }
@@ -87,6 +87,7 @@
 	}
 
   #top_panel {
+    font-family: helvetica, sans-serif, tahoma;
     position: fixed;
     width: 95%;
     padding: 0 0 20px 20px;
@@ -133,7 +134,7 @@
   #map_container {
     position: fixed;
     top: 130px;
-    right: 20px;
+    right: 100px;
   }
 
   .datamaps-subunits {
@@ -144,7 +145,14 @@
     cursor: pointer;
   }
 
+  #linegraph_container {
+    position: fixed;
+    top: 500px;
+    right: 10px;
+  }
+
   #linegraph_container path { 
+
     stroke: black;
     stroke-width: 2;
     fill: none;
