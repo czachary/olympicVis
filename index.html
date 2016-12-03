@@ -21,16 +21,15 @@
       &nbsp;
     </div>
 
-    <div class="stackedTitle">Total Medal Count by Country</div>
+    <div id="sportsFilter">Filter by Sport...</div> <!-- TODO -->
 
+    <div class="stackedTitle">Total Medal Count by Country</div>
     <div class="scroll-on-left">
       <div id="stackedBar_container"></div>
     </div>
 
-
     <div id="map_container"></div>
     <div id="linegraph_container"></div>
-    <div id="sportsFilter"></div> <!-- TODO: top right under slider, above map? -->
 
 
     <script src="map.js"></script>
@@ -139,7 +138,7 @@
 
   #map_container {
     position: fixed;
-    top: 130px;
+    top: 180px;
     right: 20px;
   }
 
@@ -188,8 +187,15 @@
     float: right;
   }
 
-  .pointerDefault {
+  .tick {
     cursor: default;
+  }
+
+  #sportsFilter {
+    height: 20px;
+    width: 300px;
+    display: inline-block;
+    float: right;
   }
 
 </style>
