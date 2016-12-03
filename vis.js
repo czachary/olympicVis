@@ -250,6 +250,7 @@ function stackedBarChart(delayGrow) {
   //highlight country in map on label hover
   yAxisObj.selectAll(".tick")[0].forEach(function(d) {
     d3.select(d)
+      .attr("class", "pointerDefault")
       .on("mouseover", function(axisLabel) {
         d1 = data.filter(function(d1) { return countryName(d1.Country) == axisLabel; })[0];
         return highlightCountry(d1.Country);
