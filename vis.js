@@ -35,8 +35,8 @@ function init() {
   initWorldMap();
   initLineGraph();
 
-  d3.csv("OlympicData.csv", onDataArrival);
   d3.csv("hostData.csv", getHostData);
+  d3.csv("OlympicData.csv", onDataArrival);
 }
 
 function initStackedBarChart() {
@@ -111,6 +111,21 @@ function initLineGraph() {
     .attr("text-anchor", "middle")
     .style("font-size", "16px")
     .text("Compare Country Medal Counts Over Time")
+
+
+  //LEGEND HOST COUNTRY INFO
+  d3.select("svg.linegraph")
+    .append("text")
+    .attr("x", lineGraphMargins.left+400)
+    .attr("y", lineGraphMargins.top-18)
+    .attr("text-anchor", "middle")
+    .text("= Host Country")
+  d3.select("svg.linegraph")
+    .append("circle")
+    .attr("cx", lineGraphMargins.left+355)
+    .attr("cy", lineGraphMargins.top-22)
+    .attr("r", "5")
+    .style("fill", "#DAA520");
 }
 
 //******YEAR CHANGE******//
@@ -123,12 +138,8 @@ function sliderChange(yearSelected) {
 }
 function updateYearInfo(yearSelected) {
   year = yearSelected;
-  datasets["hosts"].forEach(function(d) {
-    if(d.Year == year) {
-      currCity = d.City;
-      currCountry = d.Country;
-    }
-  })
+  currCity = datasets["hosts"][year]["city"];
+  currCountry = datasets["hosts"][year]["country"];
   document.getElementById("hostInfo").innerHTML = year + ": " + currCity + ", " + currCountry;
 }
 
@@ -138,9 +149,13 @@ function getHostData(error, data) {
     console.warn(error);
     return
   }
-  datasets["hosts"] = data;
-  datasets["hosts"].forEach(function(d) {
-    d.Year = +d.Year;
+  datasets["hosts"] = {};
+  data.forEach(function(d) {
+    newEntry = {};
+    newEntry["city"] = d.City;
+    newEntry["country"] = d.Country;
+    newEntry["countryCode"] = d.CountryCode;
+    datasets["hosts"][d.Year] = newEntry;
   })
 }
 function onDataArrival(error, data) {
@@ -497,8 +512,14 @@ function redraw() {
     .selectAll("circle")
     .data(medalsOverTime)
     .enter().append("circle")
-    .attr("fill", function(d) { return assignedColors[d.country]; })
-    .attr("r", 3)
+    .attr("fill", function(d) {
+      if(datasets["hosts"][d.year] != null && datasets["hosts"][d.year]["countryCode"] == d.country) return "#DAA520";
+      return assignedColors[d.country];
+    })
+    .attr("r", function(d) {
+      if(datasets["hosts"][d.year] != null && datasets["hosts"][d.year]["countryCode"] == d.country) return "5";
+      return "3";
+    })
     .attr("cx", function(d) { return x_scaleLine(d.year)+13; })
     .attr("cy", function(d) { return y_scaleLine(d.count); })
     .on("mouseover", function(d) {
@@ -536,7 +557,7 @@ function redraw() {
   .attr("width", 10)
   .attr("height", 10)
   .style("fill", function(d) { return assignedColors[d.key]; })
-    
+
   legend.selectAll('text')
     .data(dataNest)
     .enter()
