@@ -190,9 +190,6 @@ function countryName(country) {
   return names.length > 0 ? names[0] : country;
 }
 
-
-
-
 //converts the ISO standard code used by datamaps to the olympic IOC country code
 //for use in line graph
 function convertToOlympicCode(code) {

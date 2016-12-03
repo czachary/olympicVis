@@ -258,6 +258,10 @@ function stackedBarChart(delayGrow) {
         d1 = data.filter(function(d1) { return countryName(d1.Country) == axisLabel; })[0];
         return unHighlightCountry(d1.Country);
       })
+      .on("click", function(axisLabel) {
+        d1 = data.filter(function(d1) { return countryName(d1.Country) == axisLabel; })[0];
+        updateLineGraphCountries(convertToOlympicCode(d1.Country));
+      })
   });
 
   // Create groups for each series, rects for each segment 
@@ -499,7 +503,7 @@ function redraw() {
     .on("mouseover", function(d) {
       lineGraphTooltip.transition()
         .duration(200)
-        .style("opacity", 0.75);
+        .style("opacity", 1);
     })
     .on("mouseout", function(d) {
       lineGraphTooltip.transition()
@@ -538,7 +542,10 @@ function redraw() {
     .append("text")
   .attr("x", lineGraphWidth - 85)
     .attr("y", function(d, i){ return i *  12 + 9;})
-  .text(function(d) { if(countryName(d.key)=="Soviet Union") return "USSR/Russia"; else return countryName(d.key); })
+  .text(function(d) {
+    if(countryName(d.key)=="Soviet Union") return "Soviet Union/Russia";
+    else return countryName(d.key);
+  })
 
 }
 
