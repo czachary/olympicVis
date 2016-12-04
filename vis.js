@@ -572,7 +572,7 @@ function redraw() {
 }
 
 
-var lineColors = ["#008080", "#808080", "#800080", "#FF0000", "#008000"];
+var lineColors = ["#9FFFCB", "#25A18E", "#7AE582", "#00A5CF", "#2E6E80"];
 var assignedColors = [];
 
 function updateLineGraphColors() {
