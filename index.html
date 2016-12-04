@@ -8,14 +8,10 @@
 </head>
 <body onload="init()">
     <div id="top_panel">
-<<<<<<< HEAD
-      <h1>Summer Olympics Medal Visualization</h1>
-=======
       <span>
         <h1 class="title">Modern Summer Olympic Games</h1>
         <h3 id="hostInfo" class="subtitle" style="display:inline-block"></h3>
       </span>
->>>>>>> master
       <span class="timeline">
         <div id="slider"></div>
       </span>
@@ -25,7 +21,8 @@
       &nbsp;
     </div>
 
-    <div id="sportsFilter">Filter by Sport...</div> <!-- TODO -->
+    <!-- TODO: dropdown of radio buttons, list of sports in sportTypes.csv -->
+    <div id="sportsFilter">Filter by Sport...</div>
 
     <div class="stackedTitle">Total Medal Count by Country</div>
     <div class="scroll-on-left">
@@ -91,22 +88,12 @@
     margin: 20px;
   }
 
-<<<<<<< HEAD
-  p {
-    font-family: helvetica, sans-serif, tahoma;
-    font-size: 13px;
-    line-height: 25px;
+  text {
+    font-family: Tahoma;
+    font-size: 11px;
   }
 
-=======
->>>>>>> master
-	text {
-    font-family: Tahoma;
-		font-size: 11px;
-	}
-
   #top_panel {
-    font-family: helvetica, sans-serif, tahoma;
     position: fixed;
     width: 95%;
     padding: 0 0 20px 20px;
@@ -152,13 +139,8 @@
 
   #map_container {
     position: fixed;
-<<<<<<< HEAD
-    top: 130px;
-    right: 100px;
-=======
-    top: 180px;
+    top: 120px;
     right: 20px;
->>>>>>> master
   }
 
   .datamaps-subunits {
@@ -171,12 +153,11 @@
 
   #linegraph_container {
     position: fixed;
-    top: 500px;
-    right: 10px;
+    top: 600px;
+    right: -10px;
   }
 
   #linegraph_container path { 
-
     stroke: black;
     stroke-width: 2;
     fill: none;
@@ -189,9 +170,18 @@
   #stackedBar_container {
     position: relative;
     width: 100%;
-    height: 250px;
+    height: 500px;
     direction: ltr;
   }
+  #sportsFilter {
+    height: 20px;
+    width: 300px;
+    position: fixed;
+    top: 700px;
+    left:10px;
+  }
+
+
   .scroll-on-left {
       overflow-x: auto;
       direction: rtl;
@@ -217,11 +207,6 @@
     cursor: default;
   }
 
-  #sportsFilter {
-    height: 20px;
-    width: 300px;
-    display: inline-block;
-    float: right;
-  }
+  
 
 </style>
