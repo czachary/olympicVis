@@ -1,8 +1,8 @@
 
 var margin = {top: 55, right: 160, bottom: 35, left: 140};
 var lineGraphMargins = {top: 55, right: 160, bottom: 35, left: 50};
-var year = 1896;
-var currCity = "Athens", currCountry = "Greece";
+var year = 2008;
+var currCity = "Beijing", currCountry = "China";
 var init_order = ["Gold", "Silver", "Bronze"];
 var stack_order = init_order.slice();
 
@@ -97,23 +97,23 @@ function initLineGraph() {
 
   d3.select("svg.linegraph")
     .append("text")
-    .attr("x", lineGraphMargins.left+150)
+    .attr("class", "graphTitle")
+    .attr("x", lineGraphWidth/2)
     .attr("y", lineGraphMargins.top-18)
     .attr("text-anchor", "middle")
-    .style("font-size", "16px")
     .text("Compare Country Medal Counts Over Time")
 
 
   //LEGEND HOST COUNTRY INFO
   d3.select("svg.linegraph")
     .append("text")
-    .attr("x", lineGraphMargins.left+400)
+    .attr("x", lineGraphWidth*(6/7))
     .attr("y", lineGraphMargins.top-18)
     .attr("text-anchor", "middle")
     .text("= Host Country")
   d3.select("svg.linegraph")
     .append("circle")
-    .attr("cx", lineGraphMargins.left+355)
+    .attr("cx", lineGraphWidth*(4/5))
     .attr("cy", lineGraphMargins.top-22)
     .attr("r", "6")
     .style("fill", "#DAA520");
@@ -175,7 +175,7 @@ function onDataArrival(error, data) {
 
   stackedBarChart();
   updateMapContainer();
-  lineGraphCountries = ["GRE"]; //default to Greece, 1896
+  lineGraphCountries = ["USA"]; //default to USA, 2008
   updateLineGraph();
 }
 

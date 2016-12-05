@@ -6,6 +6,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
     <script src="datamaps.world.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <link href="bootstrap/bootstrap.min.css" rel="stylesheet">
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
@@ -14,17 +15,16 @@
 
 </head>
 <body onload="init()">
-    <div id="top_panel">
-      <span>
-        <h1 class="title">Modern Summer Olympic Games</h1>
-        <h3 id="hostInfo" class="subtitle" style="display:inline-block"></h3>
-      </span>
+    <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+
+        <h1 class="title headingText">Modern Summer Olympic Games</h1>
+        <h3 id="hostInfo" class="subtitle headingText" style="display:inline-block"></h3>
+
       <div class="timeline clickable">
         <div id="slider"></div>
       </div>
-
      <div id="sportsFilter" class="button-group">
-        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Filter by Sport...<span class="caret"></span></button>
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Filter by Sport...</button>
         <ul class="dropdown-menu multi-column columns-2">
           <div class="row">
             <div class="col-sm-6">
@@ -82,13 +82,13 @@
           </div>
         </ul>
       </div>
-    </div>
+    </nav>
 
     <div class="spacer">
       &nbsp;
     </div>
 
-    <div class="stackedTitle">Total Medal Count by Country</div>
+    <div class="graphTitle">Medal Count Breakdown by Country</div>
     <div class="scroll-on-left">
       <div id="stackedBar_container"></div>
     </div>
@@ -170,14 +170,12 @@
 
 <style>
 
-  body {
-    margin: 20px;
-  }
 
   text {
     font-family: Tahoma;
     font-size: 11px;
   }
+
 
   #top_panel {
     position: fixed;
@@ -191,7 +189,7 @@
 
   .spacer {
     width: 100%;
-    height: 85px;
+    height: 75px;
   }
 
   #slider label {
@@ -202,8 +200,11 @@
     text-align: center;
   }
 
+  .timeline {
+    padding-top: 5px;
+  }
   .timeline * {
-    font-size: 10px;
+    font-size: 12px;
     margin-bottom: 10px;
     width: 80%;
   }
@@ -263,7 +264,7 @@
   #sportsFilter {
     position: absolute;
     top: 54px;
-    right: 0%;
+    right: 2%;
     width: 15%;
   }
 
@@ -274,10 +275,11 @@
   }
 
 
-  .stackedTitle {
+  .graphTitle {
     display: inline-block;
     font-family: Tahoma;
     padding-left: 50px;
+    font-size: 17px;
   }
   .title {
     font-size: x-large;
@@ -308,6 +310,7 @@
   }
   .dropdown-toggle {
     width: 100%;
+    font-size: 14px;
   }
   
   li {
@@ -331,5 +334,18 @@
   .bold {
     font-weight: bold;
   }
+
+  body {
+    padding-top: 5rem;
+  }
+  .navbar {
+    padding: 0px 20px;
+    height: 105px;
+  }
+  .navbar > .headingText {
+    margin-top: 13px;
+    color: black;
+  }
+
 
 </style>
