@@ -20,6 +20,7 @@ var lineGraphTooltip = d3.select("body").append("div")
   .style("opacity", 0);
 
 var datasets = {}
+var sportFilter = [];
 
 var lineGraphWidth = 800, lineGraphHeight = 160;
 var lineGraph, valueline;
@@ -39,7 +40,7 @@ function init() {
 
 function initStackedBarChart() {
 
-  width = 500, height = 500;
+  width = 600, height = 500;
 
   barChart = d3.select('#stackedBar_container')
     .append("svg")
@@ -140,6 +141,10 @@ function updateYearInfo(yearSelected) {
   currCountry = datasets["hosts"][year]["country"];
   document.getElementById("hostInfo").innerHTML = year + ": " + currCity + ", " + currCountry;
 }
+function updateSportFilter(sports) {
+  sportFilter = sports;
+  sliderChange(year);
+}
 
 //*******PREPARE DATA**********/
 function getHostData(error, data) {
@@ -195,7 +200,7 @@ function prepareAndFilterData() {
 
     var filteredMedals = datasets["countries"][key]
       .filter(function(d) {
-        if (d.Year == year) return true;
+        if (d.Year == year) { if(sportFilter.length == 0) return true; else return sportFilter.includes(d.Sport); }
       });
 
     if (filteredMedals.length == 0) continue;
@@ -396,6 +401,8 @@ function redraw() {
 
   var medalsOverTime = [];
 
+  checkSport = (sportFilter.length!=0);
+
   lineGraphCountries.forEach(function(d) {
     for(currYear=1896; currYear<=2008; currYear+=4) {
       newEntry = {};
@@ -406,14 +413,14 @@ function redraw() {
       if (datasets["countries"][d] != null) {
         datasets["countries"][d].forEach(function(medal) {
           medalYear = +medal.Year;
-          if(medalYear == currYear) {
+          if(medalYear == currYear && (!checkSport || (checkSport && sportFilter.includes(medal.Sport)))) {
             count++;
           }
         })
         if(d=="URS") { //SovietUnion + Russia 
           datasets["countries"]["RUS"].forEach(function(medal) {
             medalYear = +medal.Year;
-            if(medalYear == currYear) {
+            if(medalYear == currYear && (!checkSport || (checkSport && sportFilter.includes(medal.Sport)))) {
               count++;
             }
           })
@@ -421,7 +428,7 @@ function redraw() {
         if(d=="TCH") { //Czechoslovakia + Bohemia 
           datasets["countries"]["BOH"].forEach(function(medal) {
             medalYear = +medal.Year;
-            if(medalYear == currYear) {
+            if(medalYear == currYear && (!checkSport || (checkSport && sportFilter.includes(medal.Sport)))) {
               count++;
             }
           })

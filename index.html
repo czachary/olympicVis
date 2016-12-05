@@ -22,7 +22,6 @@
       <div class="timeline clickable">
         <div id="slider"></div>
       </div>
-      <!-- TODO: dropdown of radio buttons, list of sports in sportTypes.csv -->
 
      <div id="sportsFilter" class="button-group">
         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Filter by Sport...<span class="caret"></span></button>
@@ -163,6 +162,7 @@
          $( event.target ).blur();
             
          console.log( options );
+         updateSportFilter(options);
          return false;
       });
     </script>
