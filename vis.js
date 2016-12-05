@@ -470,9 +470,8 @@ function redraw() {
       .y(function(d) { return y_scaleLine(d.count); });
 
 
-  d3.selectAll(".thegraph").remove();
   var thegraph = lineGraph.selectAll(".thegraph")
-      .data(dataNest)
+    .data(dataNest, function(d, i) { return d.key; })
 
   //Enter new country lines
   var thegraphEnter = thegraph.enter().append("g")
@@ -485,6 +484,16 @@ function redraw() {
       .attr("class", "line")
         .style("stroke", function(d) { return assignedColors[d.key]; })
         .attr("d", function(d) { return valueline(d.values); })
+        .transition()
+        .duration(2000)
+        .attrTween('d',function (d){
+            var interpolate = d3.scale.quantile()
+              .domain([0,1])
+              .range(d3.range(1, d.values.length+1));
+            return function(t){
+              return valueline(d.values.slice(0, interpolate(t)));
+          };
+        });
 
   //remove old country lines
   thegraph.exit().remove();
@@ -517,22 +526,16 @@ function redraw() {
     .selectAll("circle")
     .data(medalsOverTime)
     .enter().append("circle")
-    .attr("fill", function(d) {
+    .style("opacity", function (d) {
       if(datasets["hosts"][d.year] != null) {
         match1 = convertCountryCode(datasets["hosts"][d.year]["countryCode"]);
         match2 = datasets["hosts"][d.year]["countryCode"];
-        if(d.country == match1 || d.country == match2) return "#DAA520";
+        if(d.country == match1 || d.country == match2) return "1";
       }
-      return assignedColors[d.country];
+      return "0";
     })
-    .attr("r", function(d) {
-      if(datasets["hosts"][d.year] != null) {
-        match1 = convertCountryCode(datasets["hosts"][d.year]["countryCode"]);
-        match2 = datasets["hosts"][d.year]["countryCode"];
-        if(d.country == match1 || d.country == match2) return "5";
-      }
-      return "3";
-    })
+    .attr("fill", "#DAA520")
+    .attr("r", "7")
     .attr("cx", function(d) { return x_scaleLine(d.year)+8; })
     .attr("cy", function(d) { return y_scaleLine(d.count); })
     .on("mouseover", function(d) {
