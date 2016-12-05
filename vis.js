@@ -320,9 +320,11 @@ function stackedBarChart(delayGrow) {
           .style("opacity", 0);
     })
     .on("mousemove", function(d) {
-      tooltip.html(d.count)
-        .style("left", (d3.event.pageX-10) + "px")
-        .style("top", (d3.event.pageY-30) + "px");
+      tooltip.html("<strong>Gold: </strong>" + d.t2m.Gold
+          + "<br><strong>Silver: </strong>" + d.t2m.Silver
+          + "<br><strong>Bronze: </strong>" + d.t2m.Bronze)
+        .style("left", (d3.event.pageX-30) + "px")
+        .style("top", (d3.event.pageY-60) + "px");
     });
 
   nested_bars_per_group.transition().delay(delayGrow ? barMoveDuration : 0).duration(700)
