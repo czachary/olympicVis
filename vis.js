@@ -301,6 +301,7 @@ function stackedBarChart(delayGrow) {
 
   nested_bars_per_group.enter()
     .append("rect")
+    .attr("class", "clickable")
     .attr("x", 0)
     .attr("y", function(d) { return y_scale(countryName(d.Country)); })
     .attr("height", function(d) { return y_scale.rangeBand(); })
@@ -324,7 +325,7 @@ function stackedBarChart(delayGrow) {
           + "<br><strong>Silver: </strong>" + d.t2m.Silver
           + "<br><strong>Bronze: </strong>" + d.t2m.Bronze)
         .style("left", (d3.event.pageX-30) + "px")
-        .style("top", (d3.event.pageY-60) + "px");
+        .style("top", (d3.event.pageY-65) + "px");
     });
 
   nested_bars_per_group.transition().delay(delayGrow ? barMoveDuration : 0).duration(700)

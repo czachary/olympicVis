@@ -19,7 +19,7 @@
         <h1 class="title">Modern Summer Olympic Games</h1>
         <h3 id="hostInfo" class="subtitle" style="display:inline-block"></h3>
       </span>
-      <div class="timeline">
+      <div class="timeline clickable">
         <div id="slider"></div>
       </div>
       <!-- TODO: dropdown of radio buttons, list of sports in sportTypes.csv -->
@@ -83,18 +83,6 @@
           </div>
         </ul>
       </div>
-<!--       <div id="sportsFilter">
-        <div class="btn-group">
-          <button data-toggle="dropdown" class="btn dropdown-toggle"  data-placeholder="Please select">Filter by Sport...<span class="caret"></span></button>
-            <ul class="dropdown-menu">
-              <li><input type="checkbox" id="ID"><label for="ID" name="NAME" value="VALUE">Label</label></li>
-              <li>
-                <input type="checkbox" id="ex3_1" name="ex3" value="1" checked>
-                <label for="ex3_1">Option1</label>
-              </li>
-            </ul>
-        </div>
-      </div> -->
     </div>
 
     <div class="spacer">
@@ -301,6 +289,9 @@
     float: right;
   }
 
+  #stackedBar_container .tick {
+    cursor: pointer;
+  }
   .tick {
     cursor: default;
   }
