@@ -255,7 +255,6 @@ function convertToOlympicCode(code) {
     case "DEU": return "EUA"; //germany -> unified team of germany
     case "CZE": return "TCH"; //czech republic -> czechoslovakia
     //case "CZE": return "BOH"; //czech republic -> bohemia //TODO: fix CZE, DONE: check added in lineGraph redraw()
-    case "AUS": return "ANZ"; //australia -> australasia
     case "RUS": return "URS"; //russia -> soviet union
     //case "RUS": return "RUS"; //russia -> russian empire //TODO: fix RUS, DONE: check added in lineGraph redraw()
     case "BIH": return "YUG"; //bosnia and herzegovina -> yugoslavia

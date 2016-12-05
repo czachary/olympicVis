@@ -5,6 +5,13 @@
     <script src="d3/d3.v3.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
     <script src="datamaps.world.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
 </head>
 <body onload="init()">
     <div id="top_panel">
@@ -12,17 +19,87 @@
         <h1 class="title">Modern Summer Olympic Games</h1>
         <h3 id="hostInfo" class="subtitle" style="display:inline-block"></h3>
       </span>
-      <span class="timeline">
+      <div class="timeline">
         <div id="slider"></div>
-      </span>
+      </div>
+      <!-- TODO: dropdown of radio buttons, list of sports in sportTypes.csv -->
+
+     <div id="sportsFilter" class="button-group">
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Filter by Sport...<span class="caret"></span></button>
+        <ul class="dropdown-menu multi-column columns-2">
+          <div class="row">
+            <div class="col-sm-6">
+              <ul class="multi-column-dropdown">
+                <a href="#" class="small" data-value="Archery" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Archery</li></a>
+                <a href="#" class="small" data-value="Badminton" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Badminton</li></a>
+                <a href="#" class="small" data-value="Baseball" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Baseball</li></a>
+                <a href="#" class="small" data-value="Basketball" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Basketball</li></a>
+                <a href="#" class="small" data-value="Basque Pelota" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Basque Pelota</li></a>
+                <a href="#" class="small" data-value="Boxing" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Boxing</li></a>
+                <a href="#" class="small" data-value="Canoe / Kayak" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Canoe / Kayak</li></a>
+                <a href="#" class="small" data-value="Cricket" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Cricket</li></a>
+                <a href="#" class="small" data-value="Croquet" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Croquet</li></a>
+                <a href="#" class="small" data-value="Cycling" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Cycling</li></a>
+                <a href="#" class="small" data-value="Diving" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Diving</li></a>
+                <a href="#" class="small" data-value="Equestrian" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Equestrian</li></a>
+                <a href="#" class="small" data-value="Fencing" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Fencing</li></a>
+                <a href="#" class="small" data-value="Football" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Football</li></a>
+                <a href="#" class="small" data-value="Golf" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Golf</li></a>
+                <a href="#" class="small" data-value="Gymnastics" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Gymnastics</li></a>
+                <a href="#" class="small" data-value="Handball" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Handball</li></a>
+                <a href="#" class="small" data-value="HockeyJeu de paume" tabIndex="-1"><li><input type="checkbox"/>&nbsp;HockeyJeu de paume</li></a>
+                <a href="#" class="small" data-value="Ice Hockey" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Ice Hockey</li></a>
+                <a href="#" class="small" data-value="Judo" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Judo</li></a>
+                <a href="#" class="small" data-value="Lacrosse" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Lacrosse</li></a>
+                <a href="#" class="small" data-value="Modern Pentathlon" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Modern Pentathlon</li></a>
+              </ul>
+            </div>
+            <div class="col-sm-6">
+              <ul class="multi-column-dropdown">
+                <a href="#" class="small" data-value="Polo" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Polo</a></li>
+                <a href="#" class="small" data-value="Rackets" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Rackets</li></a>
+                <a href="#" class="small" data-value="Roque" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Roque</li></a>
+                <a href="#" class="small" data-value="Rowing" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Rowing</li></a>
+                <a href="#" class="small" data-value="Rugby" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Rugby</li></a>
+                <a href="#" class="small" data-value="Sailing" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Sailing</li></a>
+                <a href="#" class="small" data-value="Shooting" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Shooting</li></a>
+                <a href="#" class="small" data-value="Skating" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Skating</li></a>
+                <a href="#" class="small" data-value="Softball" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Softball</li></a>
+                <a href="#" class="small" data-value="Swimming" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Swimming</li></a>
+                <a href="#" class="small" data-value="Synchronized S." tabIndex="-1"><li><input type="checkbox"/>&nbsp;Synchronized Swimming</li></a>
+                <a href="#" class="small" data-value="Table Tennis" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Table Tennis</li></a>
+                <a href="#" class="small" data-value="Taekwondo" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Taekwondo</li></a>
+                <a href="#" class="small" data-value="Tennis" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Tennis</li></a>
+                <a href="#" class="small" data-value="Athletics" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Track and Field</li></a>
+                <a href="#" class="small" data-value="Triathlon" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Triathlon</li></a>
+                <a href="#" class="small" data-value="Tug of War" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Tug of War</li></a>
+                <a href="#" class="small" data-value="Volleyball" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Volleyball</li></a>
+                <a href="#" class="small" data-value="Water Motorsports" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Water Motorsports</li></a>
+                <a href="#" class="small" data-value="Water polo" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Water Polo</li></a>
+                <a href="#" class="small" data-value="Weightlifting" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Weightlifting</li></a>
+                <a href="#" class="small" data-value="Wrestling" tabIndex="-1"><li><input type="checkbox"/>&nbsp;Wrestling</li></a>
+              </ul>
+            </div>
+          </div>
+        </ul>
+      </div>
+<!--       <div id="sportsFilter">
+        <div class="btn-group">
+          <button data-toggle="dropdown" class="btn dropdown-toggle"  data-placeholder="Please select">Filter by Sport...<span class="caret"></span></button>
+            <ul class="dropdown-menu">
+              <li><input type="checkbox" id="ID"><label for="ID" name="NAME" value="VALUE">Label</label></li>
+              <li>
+                <input type="checkbox" id="ex3_1" name="ex3" value="1" checked>
+                <label for="ex3_1">Option1</label>
+              </li>
+            </ul>
+        </div>
+      </div> -->
     </div>
 
     <div class="spacer">
       &nbsp;
     </div>
-
-    <!-- TODO: dropdown of radio buttons, list of sports in sportTypes.csv -->
-    <div id="sportsFilter">Filter by Sport...</div>
 
     <div class="stackedTitle">Total Medal Count by Country</div>
     <div class="scroll-on-left">
@@ -79,6 +156,27 @@
 
         });
       });
+      var options = [];
+      $( '.dropdown-menu a' ).on( 'click', function( event ) {
+
+         var $target = $( event.currentTarget ),
+             val = $target.attr( 'data-value' ),
+             $inp = $target.find( 'input' ),
+             idx;
+
+         if ( ( idx = options.indexOf( val ) ) > -1 ) {
+            options.splice( idx, 1 );
+            setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
+         } else {
+            options.push( val );
+            setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
+         }
+
+         $( event.target ).blur();
+            
+         console.log( options );
+         return false;
+      });
     </script>
 </body>
 
@@ -119,7 +217,7 @@
   .timeline * {
     font-size: 10px;
     margin-bottom: 10px;
-    width: 60%;
+    width: 80%;
   }
 
   .tooltip {
@@ -154,7 +252,7 @@
 
   #linegraph_container {
     position: fixed;
-    top: 530px;
+    top: 520px;
     right: -60px;
   }
 
@@ -171,15 +269,14 @@
   #stackedBar_container {
     position: relative;
     width: 100%;
-    height: 500px;
+    height: 600px;
     direction: ltr;
   }
   #sportsFilter {
-    height: 20px;
-    width: 300px;
-    position: fixed;
-    top: 700px;
-    left:10px;
+    position: absolute;
+    top: 54px;
+    right: 0%;
+    width: 15%;
   }
 
 
@@ -208,6 +305,37 @@
     cursor: default;
   }
 
+  .dropdown-menu {
+    position: relative;
+    float: right;
+    margin-left: -112px;
+  }
+  .multi-column-dropdown {
+    list-style-type: none;
+    padding-left: 0px;
+    padding-bottom: 10px;
+  }
+  .dropdown-toggle {
+    width: 100%;
+  }
   
+  li {
+    color: black;
+    padding-left: 20px;
+    border:none;
+  }
+  li:hover {
+    background-color: #D9F0FF;
+  }
+  a:link,
+  a:visited,
+  a:hover,
+  a:focus,
+  a:active {
+    color: black;
+    text-decoration: none;
+    border: none;
+  }
+
 
 </style>

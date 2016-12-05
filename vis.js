@@ -21,7 +21,7 @@ var lineGraphTooltip = d3.select("body").append("div")
 
 var datasets = {}
 
-var lineGraphWidth = 800, lineGraphHeight = 200;
+var lineGraphWidth = 800, lineGraphHeight = 160;
 var lineGraph, valueline;
 var lineGraphCountries = [];
 var x_scaleLine, y_scaleLine, xAxisLine, yAxisLine;
@@ -508,11 +508,19 @@ function redraw() {
     .data(medalsOverTime)
     .enter().append("circle")
     .attr("fill", function(d) {
-      if(datasets["hosts"][d.year] != null && datasets["hosts"][d.year]["countryCode"] == d.country) return "#DAA520";
+      if(datasets["hosts"][d.year] != null) {
+        match1 = convertCountryCode(datasets["hosts"][d.year]["countryCode"]);
+        match2 = datasets["hosts"][d.year]["countryCode"];
+        if(d.country == match1 || d.country == match2) return "#DAA520";
+      }
       return assignedColors[d.country];
     })
     .attr("r", function(d) {
-      if(datasets["hosts"][d.year] != null && datasets["hosts"][d.year]["countryCode"] == d.country) return "5";
+      if(datasets["hosts"][d.year] != null) {
+        match1 = convertCountryCode(datasets["hosts"][d.year]["countryCode"]);
+        match2 = datasets["hosts"][d.year]["countryCode"];
+        if(d.country == match1 || d.country == match2) return "5";
+      }
       return "3";
     })
     .attr("cx", function(d) { return x_scaleLine(d.year)+8; })
