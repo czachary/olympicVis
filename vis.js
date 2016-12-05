@@ -50,14 +50,6 @@ function initStackedBarChart() {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + (margin.top-30) + ")");
 
-  // d3.select("svg.stackedBar")
-  //   .append("text")
-  //   .attr("x", (width / 2))
-  //   .attr("y", margin.top-18)
-  //   .attr("text-anchor", "middle")
-  //   .style("font-size", "16px")
-  //   .text("Total Medal Count by Country")
-
   // Set x, y and colors
   x_scale = d3.scale.linear()
     .domain([0, 200])
@@ -123,7 +115,7 @@ function initLineGraph() {
     .append("circle")
     .attr("cx", lineGraphMargins.left+355)
     .attr("cy", lineGraphMargins.top-22)
-    .attr("r", "5")
+    .attr("r", "6")
     .style("fill", "#DAA520");
 }
 
@@ -270,6 +262,18 @@ function stackedBarChart(delayGrow) {
   //highlight country in map on label hover
   yAxisObj.selectAll(".tick")[0].forEach(function(d) {
     d3.select(d)
+      .attr("fill", function(d) {
+        match1 = datasets["hosts"][year]["country"];
+        match2 = countryName(datasets["hosts"][year]["countryCode"]);
+        if(d == match1 || d == match2) { return "#DAA520"; }
+        else return "black";
+      })
+      .attr("font-weight", function(d) {
+        match1 = datasets["hosts"][year]["country"];
+        match2 = countryName(datasets["hosts"][year]["countryCode"]);
+        if(d == match1 || d == match2) { return "bold"; }
+        else return "normal";
+      })
       .on("mouseover", function(axisLabel) {
         d1 = data.filter(function(d1) { return countryName(d1.Country) == axisLabel; })[0];
         return highlightCountry(d1.Country);
@@ -535,7 +539,7 @@ function redraw() {
       return "0";
     })
     .attr("fill", "#DAA520")
-    .attr("r", "7")
+    .attr("r", "6")
     .attr("cx", function(d) { return x_scaleLine(d.year)+8; })
     .attr("cy", function(d) { return y_scaleLine(d.count); })
     .on("mouseover", function(d) {
