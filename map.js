@@ -1,6 +1,6 @@
 var mapDefaultFill = "#F5F5F5";
 var mapBorderColor = "#DEDEDE";
-var mapHighlightBorderColor = "#B7B7B7";
+var mapHighlightBorderColor = "#000000";
 
 var world_map;
 
@@ -79,7 +79,7 @@ function updateMapContainer() {
 
   var paletteScale = d3.scale.linear()
     .domain([minValue, maxValue])
-    .range(["#f7fcb9", "#31a354"]); // green color
+    .range(["#B9E6F1", "#1E5563"]); // green color
 
   data.forEach(function(d) {
     var value = d.totalMedalCount;
