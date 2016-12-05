@@ -8,8 +8,8 @@ function initWorldMap() {
 
   world_map = new Datamap({
     element: document.getElementById("map_container"),
-    height: 400,
-    width: 600,
+    height: 450,
+    width: 800,
     projection: 'mercator',
     fills: {
       defaultFill: mapDefaultFill,
@@ -28,7 +28,10 @@ function initWorldMap() {
           if (!d.numberOfThings) { return ; }
           return ['<div class="hoverinfo">',
               '<strong>', geo.properties.name, '</strong>',
-              '<br>Count: <strong>', d.numberOfThings, '</strong>',
+              '<br>Total: <strong>', d.numberOfThings, '</strong>',
+              '<br>Gold: <strong>', d.gold, '</strong>',
+              '<br>Silver: <strong>', d.silver, '</strong>',
+              '<br>Bronze: <strong>', d.bronze, '</strong>',
               '</div>'].join('');
       }
     },
@@ -82,8 +85,18 @@ function updateMapContainer() {
     .range(["#B9E6F1", "#1E5563"]); // green color
 
   data.forEach(function(d) {
+    goldCount = 0; silverCount = 0; bronzeCount = 0;
+    d["medals_per_type"].forEach(function(medalCount) {
+      if(medalCount.type == "Gold") goldCount = medalCount.count;
+      else if(medalCount.type == "Silver") silverCount = medalCount.count;
+      else if(medalCount.type == "Bronze") bronzeCount = medalCount.count;
+    })
     var value = d.totalMedalCount;
-    dataset[convertCountryCode(d.Country)] = { numberOfThings: value, fillColor: paletteScale(value) };
+    dataset[convertCountryCode(d.Country)] = {
+      numberOfThings: value,
+      fillColor: paletteScale(value),
+      gold: goldCount, silver: silverCount, bronze: bronzeCount
+    };
   });
 
   world_map.updateChoropleth(dataset, {reset: true});

@@ -21,10 +21,9 @@ var lineGraphTooltip = d3.select("body").append("div")
 
 var datasets = {}
 
-var lineGraphWidth = 500, lineGraphHeight = 150;
+var lineGraphWidth = 800, lineGraphHeight = 200;
 var lineGraph, valueline;
 var lineGraphCountries = [];
-var numCushionYears = 4;
 var x_scaleLine, y_scaleLine, xAxisLine, yAxisLine;
 
 
@@ -35,8 +34,7 @@ function init() {
   initWorldMap();
   initLineGraph();
 
-  d3.csv("hostData.csv", getHostData);
-  d3.csv("OlympicData.csv", onDataArrival);
+  d3.csv("hostData.csv", getHostData); //force host data collected first, then call OlympicData.csv
 }
 
 function initStackedBarChart() {
@@ -157,6 +155,7 @@ function getHostData(error, data) {
     newEntry["countryCode"] = d.CountryCode;
     datasets["hosts"][d.Year] = newEntry;
   })
+  d3.csv("OlympicData.csv", onDataArrival);
 }
 function onDataArrival(error, data) {
   if (error) {
@@ -394,14 +393,8 @@ function redraw() {
 
   var medalsOverTime = [];
 
-  //get year range to display
-  startYear = year - (numCushionYears*4);
-  endYear = year + (numCushionYears*4);
-  if (startYear < 1896) { startYear = 1896; endYear = 1928; }
-  if (endYear > 2008) { startYear = 1976; endYear = 2008; }
-
   lineGraphCountries.forEach(function(d) {
-    for(currYear=startYear; currYear<=endYear; currYear+=4) {
+    for(currYear=1896; currYear<=2008; currYear+=4) {
       newEntry = {};
       newEntry["country"] = d;
       newEntry["year"] = currYear;
@@ -447,9 +440,11 @@ function redraw() {
   x_scaleLine.domain(medalsOverTime.map(function(d) { return d.year; }));
   y_scaleLine.domain([0, d3.max(medalsOverTime, function(d) { return d.count; })]);
 
+
   // Define the axes
   xAxisLine = d3.svg.axis().scale(x_scaleLine)
-      .orient("bottom");
+      .orient("bottom")
+      .tickValues(function() { ticks = []; for(i=1896;i<=2008;i+=8) ticks.push(String(i)); return ticks; });
   lineGraph.append("svg:g")
       .attr("class", "x axis");
 
@@ -520,7 +515,7 @@ function redraw() {
       if(datasets["hosts"][d.year] != null && datasets["hosts"][d.year]["countryCode"] == d.country) return "5";
       return "3";
     })
-    .attr("cx", function(d) { return x_scaleLine(d.year)+13; })
+    .attr("cx", function(d) { return x_scaleLine(d.year)+8; })
     .attr("cy", function(d) { return y_scaleLine(d.count); })
     .on("mouseover", function(d) {
       lineGraphTooltip.transition()
@@ -534,9 +529,9 @@ function redraw() {
     })
     .on("mousemove", function(d) {
       lineGraphTooltip
-        .html(d.count)
-        .style("left", (d3.event.pageX-10) + "px")
-        .style("top", (d3.event.pageY-30) + "px");
+        .html("<strong>Year: </strong>" + d.year + "<br><strong>Count: </strong>" + d.count)
+        .style("left", (d3.event.pageX-40) + "px")
+        .style("top", (d3.event.pageY-50) + "px");
       lineGraphTooltip.style("opacity", 1);
     });
 
