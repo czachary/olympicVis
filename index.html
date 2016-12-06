@@ -89,6 +89,17 @@
     </div>
 
     <div class="graphTitle">Medal Count Breakdown by Country</div>
+    <select id="sort-select" class="form-control" onChange="javascript:updateSort();">
+      <option>A-Z</option>
+      <option selected="true">Medal Count</option>
+      <option>Gold</option>
+      <option>Silver</option>
+      <option>Bronze</option>
+    </select>
+    <label class="order-checkbox"><input type="checkbox" value="" onChange="toggleSortDirection();" style="margin-right:5px">Reverse Order</label>
+
+
+
     <div class="scroll-on-left">
       <div id="stackedBar_container"></div>
     </div>
@@ -296,6 +307,18 @@
   }
   .tick {
     cursor: default;
+  }
+
+  #sort-select {
+    position: relative;
+    max-width: 130px;
+    min-height: 30px;
+    display: inline-block;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+  .order-checkbox {
+    display: inline-block;
   }
 
   .dropdown-menu {

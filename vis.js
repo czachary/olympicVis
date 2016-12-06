@@ -21,6 +21,8 @@ var lineGraphTooltip = d3.select("body").append("div")
 
 var datasets = {}
 var sportFilter = [];
+var sortBy = 1;
+var reversed = false;
 
 var lineGraphWidth = 800, lineGraphHeight = 160;
 var lineGraph, valueline;
@@ -137,6 +139,17 @@ function updateSportFilter(sports) {
   sportFilter = sports;
   sliderChange(year);
 }
+function updateSort() {
+  sortBy = document.getElementById('sort-select').selectedIndex;
+  prepareAndFilterData();
+  stackedBarChart(barMoveDuration);
+}
+
+function toggleSortDirection() {
+  reversed = !reversed;
+  prepareAndFilterData();
+  stackedBarChart(barMoveDuration);
+}
 
 //*******PREPARE DATA**********/
 function getHostData(error, data) {
@@ -220,7 +233,22 @@ function prepareAndFilterData() {
     }
     countryMedalCounts.push(countryEntry);
   }
-  countryMedalCounts.sort(function(a,b) { return b.totalMedalCount - a.totalMedalCount;})
+
+  countryMedalCounts.sort(getSortFunction());
+}
+
+function getSortFunction() {
+  if (sortBy == 0) {
+    return function(a,b) { return (reversed ? -1 : 1) * d3.ascending(a.Country, b.Country);}
+  } else if (sortBy == 1) {
+    return function(a,b) { return (reversed ? -1 : 1) * (b.totalMedalCount - a.totalMedalCount);}
+  } else if (sortBy == 2) {
+    return function(a,b) { return (reversed ? -1 : 1) * (b.medals_per_type[0].t2m["Gold"] - a.medals_per_type[0].t2m["Gold"]);}
+  } else if (sortBy == 3) {
+    return function(a,b) { return (reversed ? -1 : 1) * (b.medals_per_type[0].t2m["Silver"] - a.medals_per_type[0].t2m["Silver"]);}
+  } else {
+    return function(a,b) { return (reversed ? -1 : 1) * (b.medals_per_type[0].t2m["Bronze"] - a.medals_per_type[0].t2m["Bronze"]);}
+  }
 }
 
 function stackedBarChart(delayGrow) {
@@ -421,16 +449,27 @@ function redraw() {
             count++;
           }
         })
-        if(d=="URS") { //SovietUnion + Russia 
-          datasets["countries"]["RUS"].forEach(function(medal) {
+        if(d=="URS") { //SovietUnion + Russia + russian empire + eun
+          russias = ["RU1", "EUN", "RUS"];
+          for (i in russias) {
+            datasets["countries"][russias[i]].forEach(function(medal) {
+              medalYear = +medal.Year;
+              if(medalYear == currYear && (!checkSport || (checkSport && sportFilter.includes(medal.Sport)))) {
+                count++;
+              }
+            })
+          }
+        }
+        if(d=="TCH") { //Czechoslovakia + Bohemia 
+          datasets["countries"]["BOH"].forEach(function(medal) {
             medalYear = +medal.Year;
             if(medalYear == currYear && (!checkSport || (checkSport && sportFilter.includes(medal.Sport)))) {
               count++;
             }
           })
         }
-        if(d=="TCH") { //Czechoslovakia + Bohemia 
-          datasets["countries"]["BOH"].forEach(function(medal) {
+        if(d=="GER") { //Germany + Unified Team of Germany
+          datasets["countries"]["EUA"].forEach(function(medal) {
             medalYear = +medal.Year;
             if(medalYear == currYear && (!checkSport || (checkSport && sportFilter.includes(medal.Sport)))) {
               count++;
@@ -509,7 +548,7 @@ function redraw() {
   thegraphUpdate.select("path")
     .style("stroke", function(d) { return assignedColors[d.key]; })
     .attr("d", function(d, i) {       
-        lastvalues[i]=d.values[d.values.length-1].value;         
+        lastvalues[i]=d.values[d.values.length-1].value;
         lastvalues.sort(function (a,b){return b-a});
       
         return valueline(d.values);
@@ -525,11 +564,11 @@ function redraw() {
 
 
   //TOOLTIPS
-  lineGraph.selectAll("circle").remove();
-  lineGraph
+  var hostCircles = lineGraph
     .selectAll("circle")
-    .data(medalsOverTime)
-    .enter().append("circle")
+    .data(medalsOverTime, function(d,i) {return d.country + " " + d.year;});
+
+  hostCircles.enter().append("circle")
     .style("opacity", function (d) {
       if(datasets["hosts"][d.year] != null) {
         match1 = convertCountryCode(datasets["hosts"][d.year]["countryCode"]);
@@ -560,6 +599,11 @@ function redraw() {
       lineGraphTooltip.style("opacity", 1);
     });
 
+    hostCircles.transition()
+      .attr("cx", function(d) { return x_scaleLine(d.year)+8; })
+      .attr("cy", function(d) { return y_scaleLine(d.count); });
+
+    hostCircles.exit().remove();
 
   //LEGEND
   d3.select(".legend").remove();
@@ -573,17 +617,20 @@ function redraw() {
     .enter()
     .append("rect")
   .attr("x", lineGraphWidth - 100)
-    .attr("y", function(d, i){ return i *  12;})
-  .attr("width", 10)
-  .attr("height", 10)
+    .attr("y", function(d, i){ return i *  14;})
+  .attr("width", 12)
+  .attr("height", 12)
   .style("fill", function(d) { return assignedColors[d.key]; })
+  .on("click", function(d) {
+    updateLineGraphCountries(d.key)
+  })
 
   legend.selectAll('text')
     .data(dataNest)
     .enter()
     .append("text")
   .attr("x", lineGraphWidth - 85)
-    .attr("y", function(d, i){ return i *  12 + 9;})
+    .attr("y", function(d, i){ return i *  14 + 10;})
   .text(function(d) {
     if(countryName(d.key)=="Soviet Union") return "Soviet Union/Russia";
     else return countryName(d.key);
